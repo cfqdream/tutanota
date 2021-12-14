@@ -122,9 +122,9 @@ export function urlIsPrefix(prefix: URL, url: URL): boolean {
 }
 
 /**
- * replace the last component in a file path with another
+ * replace the last component in a path with another
  * @param p path to a file/folder
- * @param file the file name to put in the last path component
+ * @param file the name to put in the last path component
  * @param pathModule path module to use for cross platform testing
  */
 export function swapFilename(p: string, file: string, pathModule: PathExports = path): string {

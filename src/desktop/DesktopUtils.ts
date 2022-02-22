@@ -159,6 +159,7 @@ export class DesktopUtils {
 				   })
 	}
 
+
 	/**
 	 * this will silently fail if we're not admin.
 	 * @param script: source of the registry script

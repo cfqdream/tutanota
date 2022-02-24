@@ -21,9 +21,7 @@ import {DesktopTray} from "./tray/DesktopTray"
 import {log} from "./DesktopLog"
 import {UpdaterWrapperImpl} from "./UpdaterWrapper"
 import {ElectronNotificationFactory} from "./NotificatonFactory"
-import {SafeStorageSecretStorage} from "./sse/SecretStorage"
 import fs from "fs"
-import path from "path"
 import {DesktopIntegrator, getDesktopIntegratorForPlatform} from "./integration/DesktopIntegrator"
 import net from "net"
 import child_process from "child_process"
@@ -45,6 +43,7 @@ import path from "path"
 import {OfflineDbFacade, OfflineDbFactory} from "./db/OfflineDbFacade"
 import {OfflineDb} from "./db/OfflineDb"
 import {DesktopInterWindowEventSender} from "./ipc/DesktopInterWindowEventSender"
+import {SafeStorageSecretStorage} from "./sse/SecretStorage"
 
 /**
  * Should be injected during build time.
@@ -103,7 +102,11 @@ if (opts.registerAsMailHandler && opts.unregisterAsMailHandler) {
 					app.exit(1)
 				})
 } else {
-	createComponents().then(startupInstance)
+	app.whenReady()
+	   .then(() => console.log("app is ready"))
+	   .then(() => desktopUtils.preloadChromium())
+	   .then(createComponents)
+	   .then(startupInstance)
 }
 
 async function createComponents(): Promise<Components> {
@@ -208,7 +211,7 @@ async function createComponents(): Promise<Components> {
 		dl,
 		sse,
 		conf,
-		keyStoreFacade: keyStoreFacade,
+		keyStoreFacade,
 		sock,
 		notifier,
 		updater,
@@ -220,7 +223,7 @@ async function createComponents(): Promise<Components> {
 }
 
 async function startupInstance(components: Components) {
-	const {dl, wm, sse} = components
+	const {dl, sse, ipc, wm, keyStoreFacade, conf} = components
 	if (!(await desktopUtils.makeSingleInstance())) return
 	// Delete the temp directory on startup because we may not always be able to do it on shutdown.
 	//
@@ -254,11 +257,7 @@ async function startupInstance(components: Components) {
 	   .on("will-quit", e => {
 		   dl.deleteTutanotaTempDirectory()
 	   })
-	app.whenReady().then(() => onAppReady(components))
-}
 
-async function onAppReady(components: Components) {
-	const {ipc, wm, keyStoreFacade, conf} = components
 	keyStoreFacade.getDeviceKey().catch(() => {
 		electron.dialog.showErrorBox("Could not access secret storage", "Please see the FAQ at tutanota.com/faq/#secretstorage")
 	})

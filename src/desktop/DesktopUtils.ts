@@ -66,6 +66,33 @@ export class DesktopUtils {
 		}
 	}
 
+	/**
+	 * electron exposes the safeStorage api, which is a chromium feature used to encrypt
+	 * cookies and passwords with a key that is stored in any available keychain.
+	 *
+	 * an undocumented "feature" is that, prior to creating the first browser window,
+	 * any call to that api will segfault immediately on linux.
+	 *
+	 * this function blocks the startup process until we're sure that safeStorage is
+	 * safe so we can encrypt sseInfo, alarms and credentials.
+	 *
+	 * https://github.com/electron/electron/issues/32206
+	 */
+	async preloadChromium(): Promise<void> {
+		if (process.platform !== "linux") {
+			return
+		}
+		return new Promise(resolve => {
+			// use a data URL to not depend on a html file
+			const dummy_html = '<!doctype html><head><title></title><meta charset="utf-8"></head><body></body>></html>'
+			const data_url = 'data:text/html;charset=UTF-8,' + encodeURIComponent(dummy_html)
+			const bw = new this.electron.BrowserWindow({show: false, webPreferences: {javascript: false}})
+			bw.loadURL(data_url)
+			bw.on('ready-to-show', bw.close).on('closed', resolve)
+		})
+	}
+
+
 	async registerAsMailtoHandler(): Promise<void> {
 		log.debug("trying to register mailto...")
 

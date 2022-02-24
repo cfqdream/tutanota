@@ -1,7 +1,7 @@
 import path from "path"
 import {spawn} from "child_process"
 import type {Rectangle} from "electron"
-import {defer, delay, noOp, uint8ArrayToHex} from "@tutao/tutanota-utils"
+import {defer, delay, uint8ArrayToHex} from "@tutao/tutanota-utils"
 import {log} from "./DesktopLog"
 import {DesktopCryptoFacade} from "./DesktopCryptoFacade"
 import {fileExists, swapFilename} from "./PathUtils"
@@ -130,33 +130,41 @@ export class DesktopUtils {
 	 *
 	 * @returns {Promise<boolean>} whether the app was successful in getting the lock
 	 */
-	makeSingleInstance(): Promise<boolean> {
+	async makeSingleInstance(): Promise<boolean> {
+
+		const islock = this.electron.app.requestSingleInstanceLock()
+		console.log("locked:", islock)
+
 		const lockfilePath = this.getLockFilePath()
+		const version = this.electron.app.getVersion()
 		// first, put down a file in temp that contains our version.
 		// will overwrite if it already exists.
 		// errors are ignored and we fall back to a version agnostic single instance lock.
-		return this.fs.promises
-				   .writeFile(lockfilePath, this.electron.app.getVersion(), "utf8")
-				   .catch(noOp)
-				   .then(() => {
-					   // try to get the lock, if there's already an instance running,
-					   // give the other instance time to see if it wants to release the lock.
-					   // if it changes the version back, it was a different version and
-					   // will terminate itself.
-					   return this.electron.app.requestSingleInstanceLock()
-						   ? Promise.resolve(true)
-						   : delay(1500)
-							   .then(() => this.singleInstanceLockOverridden())
-							   .then(canStay => {
-								   if (canStay) {
-									   this.electron.app.requestSingleInstanceLock()
-								   } else {
-									   this.electron.app.quit()
-								   }
-
-								   return canStay
-							   })
-				   })
+		console.log("writing", version)
+		try {
+			// as of electron 17.1.0, fs.promises.writeFile doesn't seem to ever resolve or reject
+			this.fs.writeFileSync(lockfilePath, version, "utf8")
+		} catch {
+			console.log("could not write lockfile, ignoring")
+		}
+		// try to get the lock, if there's already an instance running,
+		// give the other instance time to see if it wants to release the lock.
+		// if it changes the version back, it was a different version and
+		// will terminate itself.
+		console.log("requesting")
+		const hasLock = await this.electron.app.requestSingleInstanceLock()
+		if (hasLock) {
+			return true
+		}
+		await delay(1500)
+		const canStay = await this.singleInstanceLockOverridden()
+		if (canStay) {
+			this.electron.app.requestSingleInstanceLock()
+		} else {
+			console.log("quitting")
+			this.electron.app.quit()
+		}
+		return canStay
 	}
 
 
@@ -262,6 +270,7 @@ export class DesktopUtils {
 	}
 
 }
+
 
 export function isRectContainedInRect(closestRect: Rectangle, lastBounds: Rectangle): boolean {
 	return (

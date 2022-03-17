@@ -40,7 +40,11 @@ import {keyManager} from "../../misc/KeyManager"
 import {logins} from "../../api/main/LoginController"
 import {Icon, progressIcon} from "../../gui/base/Icon"
 import {Icons} from "../../gui/base/icons/Icons"
-import {LockedError} from "../../api/common/error/RestError"
+import type {MailAddress} from "../../api/entities/tutanota/MailAddress"
+import {createMailAddress} from "../../api/entities/tutanota/MailAddress"
+import {createEncryptedMailAddress} from "../../api/entities/tutanota/EncryptedMailAddress"
+import {CustomerTypeRef} from "../../api/entities/sys/Customer"
+import {LockedError, NotAuthorizedError, NotFoundError} from "../../api/common/error/RestError"
 import {BootIcons} from "../../gui/base/icons/BootIcons"
 import {theme} from "../../gui/theme"
 import {client} from "../../misc/ClientDetector"
@@ -55,18 +59,21 @@ import {navButtonRoutes} from "../../misc/RouteChange"
 import {RecipientButton} from "../../gui/base/RecipientButton"
 import type {Mail} from "../../api/entities/tutanota/Mail"
 import {EventBanner} from "./EventBanner"
+import {checkApprovalStatus} from "../../misc/LoginUtils"
+import type {MailboxDetail, MailModel} from "../model/MailModel"
+import {UserError} from "../../api/main/UserError"
+import {showUserError} from "../../misc/ErrorHandlerImpl"
+import {EntityClient} from "../../api/common/EntityClient"
 import type {InlineImageReference} from "./MailGuiUtils"
 import {moveMails, promptAndDeleteMails} from "./MailGuiUtils"
 import {locator} from "../../api/main/MainLocator"
 import {BannerType, InfoBanner} from "../../gui/base/InfoBanner"
 import {createMoreSecondaryButtonAttrs, ifAllowedTutanotaLinks} from "../../gui/base/GuiUtils"
 import {copyToClipboard} from "../../misc/ClipboardUtils";
+import {PartialRecipient} from "../../api/common/recipients/Recipient"
 import {ContentBlockingStatus, MailViewerViewModel} from "./MailViewerViewModel"
 import {getListId} from "../../api/common/utils/EntityUtils"
 import {createEmailSenderListElement} from "../../api/entities/sys/EmailSenderListElement"
-import {checkApprovalStatus} from "../../misc/LoginUtils"
-import {UserError} from "../../api/main/UserError"
-import {showUserError} from "../../misc/ErrorHandlerImpl"
 
 assertMainOrNode()
 // map of inline image cid to InlineImageReference
@@ -363,8 +370,7 @@ export class MailViewer implements Component<MailViewerAttrs> {
 				},
 				onupdate: vnode => {
 					const dom = vnode.dom as HTMLElement
-
-					this.viewModel.setDomBody(dom)
+						this.viewModel.setDomBody(dom)
 
 					// Only measure and update line height once.
 					// BUT we need to do in from onupdate too if we swap mailViewer but mithril does not realize

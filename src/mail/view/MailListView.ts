@@ -8,7 +8,7 @@ import type {Mail} from "../../api/entities/tutanota/Mail"
 import {MailTypeRef} from "../../api/entities/tutanota/Mail"
 import {canDoDragAndDropExport, getArchiveFolder, getFolderName, getInboxFolder} from "../model/MailUtils"
 import {findAndApplyMatchingRule, isInboxList} from "../model/InboxRuleHandler"
-import {ConnectionError, NotFoundError} from "../../api/common/error/RestError"
+import {NotFoundError} from "../../api/common/error/RestError"
 import {size} from "../../gui/size"
 import {styles} from "../../gui/styles"
 import {Icon} from "../../gui/base/Icon"
@@ -17,7 +17,7 @@ import {logins} from "../../api/main/LoginController"
 import type {ButtonAttrs} from "../../gui/base/ButtonN"
 import {ButtonColor, ButtonN, ButtonType} from "../../gui/base/ButtonN"
 import {Dialog} from "../../gui/base/Dialog"
-import {assertNotNull, AsyncResult, debounce, downcast, neverNull, ofClass, promiseFilter, promiseMap} from "@tutao/tutanota-utils"
+import {assertNotNull, Async, AsyncStatus, debounce, downcast, neverNull, ofClass, promiseFilter, promiseMap} from "@tutao/tutanota-utils"
 import {locator} from "../../api/main/MainLocator"
 import {getLetId, haveSameId, sortCompareByReverseId} from "../../api/common/utils/EntityUtils"
 import {moveMails, promptAndDeleteMails} from "./MailGuiUtils"
@@ -45,7 +45,7 @@ export class MailListView implements Component {
 	exportedMails: Map<string,
 		{
 			fileName: string
-			result: AsyncResult<any>
+			result: Async<any>
 		}>
 	// Used for modifying the cursor during drag and drop
 	_listDom: HTMLElement | null
@@ -212,7 +212,7 @@ export class MailListView implements Component {
 			const key = mapKey(mail)
 			const existing = this.exportedMails.get(key)
 
-			if (!existing || existing.result.state().status === "failure") {
+			if (!existing || existing.result.state().status === AsyncStatus.Rejected) {
 				// Something went wrong last time we tried to drag this file,
 				// so try again (not confident that it will work this time, though)
 				handleNotDownloaded(mail)
@@ -221,12 +221,12 @@ export class MailListView implements Component {
 
 				switch (state.status) {
 					// Mail is still being prepared, already has a file path assigned to it
-					case "pending": {
+					case AsyncStatus.Pending: {
 						handleDownloaded(existing.fileName, state.promise)
-						continue
+						break
 					}
 
-					case "complete": {
+					case AsyncStatus.Resolved: {
 						// We have downloaded it, but we need to check if it still exists
 						const exists = await locator.fileApp.checkFileExistsInExportDirectory(existing.fileName)
 
@@ -260,7 +260,7 @@ export class MailListView implements Component {
 				})
 				this.exportedMails.set(key, {
 					fileName: name,
-					result: new AsyncResult(downloadPromise),
+					result: new Async(downloadPromise),
 				})
 				await downloadPromise
 				return name

@@ -64,7 +64,6 @@ import {checkApprovalStatus} from "../../misc/LoginUtils"
 import {formatDateTime, urlEncodeHtmlTags} from "../../misc/Formatter"
 import {UserError} from "../../api/main/UserError"
 import {showUserError} from "../../misc/ErrorHandlerImpl"
-import {ResponseMailParameters} from "../editor/SendMailModel"
 import {GroupInfo} from "../../api/entities/sys/GroupInfo"
 import {CustomerTypeRef} from "../../api/entities/sys/Customer"
 import {showProgressDialog} from "../../gui/dialogs/ProgressDialog"
@@ -77,6 +76,7 @@ import {CancelledError} from "../../api/common/error/CancelledError"
 import {LoadingStateTracker} from "../../offline/LoadingState"
 import {IServiceExecutor} from "../../api/common/ServiceRequest"
 import {ListUnsubscribeService} from "../../api/entities/tutanota/Services"
+import {InitAsResponseArgs} from "../editor/SendMailModel"
 
 const SCROLL_FACTOR = 4 / 5
 
@@ -690,7 +690,7 @@ export class MailViewerViewModel {
 	}
 
 
-	private createResponseMailArgsForForwarding(recipients: MailAddress[], replyTos: EncryptedMailAddress[], addSignature: boolean): Promise<ResponseMailParameters> {
+	private async createResponseMailArgsForForwarding(recipients: MailAddress[], replyTos: EncryptedMailAddress[], addSignature: boolean): Promise<InitAsResponseArgs> {
 		let infoLine = lang.get("date_label") + ": " + formatDateTime(this.mail.sentDate) + "<br>"
 		infoLine += lang.get("from_label") + ": " + this.getSender().address + "<br>"
 
@@ -708,20 +708,18 @@ export class MailViewerViewModel {
 		const mailSubject = this.getSubject() || ""
 		infoLine += lang.get("subject_label") + ": " + urlEncodeHtmlTags(mailSubject)
 		let body = infoLine + '<br><br><blockquote class="tutanota_quote">' + this.getMailBody() + "</blockquote>"
-		return Promise.all([this.getSenderOfResponseMail(), import("../signature/Signature")]).then(([senderMailAddress, {prependEmailSignature}]) => {
-			return {
-				previousMail: this.mail,
-				conversationType: ConversationType.FORWARD,
-				senderMailAddress,
-				toRecipients: recipients,
-				ccRecipients: [],
-				bccRecipients: [],
-				attachments: this.attachments.slice(),
-				subject: "FWD: " + mailSubject,
-				bodyText: addSignature ? prependEmailSignature(body, logins) : body,
-				replyTos,
-			}
-		})
+		const {prependEmailSignature} = await import("../signature/Signature")
+		const senderMailAddress = await this.getSenderOfResponseMail()
+		return {
+			previousMail: this.mail,
+			conversationType: ConversationType.FORWARD,
+			senderMailAddress,
+			recipients,
+			attachments: this.attachments.slice(),
+			subject: "FWD: " + mailSubject,
+			bodyText: addSignature ? prependEmailSignature(body, logins) : body,
+			replyTos,
+		}
 	}
 
 	async reply(replyAll: boolean): Promise<void> {
@@ -785,9 +783,11 @@ export class MailViewerViewModel {
 						previousMail: this.mail,
 						conversationType: ConversationType.REPLY,
 						senderMailAddress,
-						toRecipients,
-						ccRecipients,
-						bccRecipients,
+						recipients: {
+							to: toRecipients,
+							cc: ccRecipients,
+							bcc: bccRecipients,
+						},
 						attachments: attachmentsForReply,
 						subject,
 						bodyText: prependEmailSignature(body, logins),

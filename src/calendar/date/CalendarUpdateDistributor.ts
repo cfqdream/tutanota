@@ -17,11 +17,10 @@ import {windowFacade} from "../../misc/WindowFacade"
 import type {EncryptedMailAddress} from "../../api/entities/tutanota/EncryptedMailAddress"
 import type {CalendarEventAttendee} from "../../api/entities/tutanota/CalendarEventAttendee"
 import {createCalendarEventAttendee} from "../../api/entities/tutanota/CalendarEventAttendee"
-import {isTutanotaMailAddress} from "../../api/common/RecipientInfo"
 import {createMailAddress} from "../../api/entities/tutanota/MailAddress"
 import {themeController} from "../../gui/theme"
 import {RecipientsNotFoundError} from "../../api/common/error/RecipientsNotFoundError"
-import {RecipientField} from "../../mail/model/MailUtils"
+import {isTutanotaMailAddress, RecipientField} from "../../mail/model/MailUtils"
 
 export interface CalendarUpdateDistributor {
 	sendInvite(existingEvent: CalendarEvent, sendMailModel: SendMailModel): Promise<void>
@@ -96,7 +95,7 @@ export class CalendarMailDistributor implements CalendarUpdateDistributor {
 				const invalidRecipients = e.message.split("\n")
 				let hasRemovedRecipient = false
 				invalidRecipients.forEach(invalidRecipient => {
-					const recipientInfo = sendMailModel.bccRecipients().find(r => r.mailAddress === invalidRecipient)
+					const recipientInfo = sendMailModel.bccRecipients().find(r => r.address === invalidRecipient)
 
 					if (recipientInfo) {
 						hasRemovedRecipient = sendMailModel.removeRecipient(recipientInfo, RecipientField.BCC, false) || hasRemovedRecipient
@@ -135,15 +134,12 @@ export class CalendarMailDistributor implements CalendarUpdateDistributor {
 									  previousMail: responseTo,
 									  conversationType: ConversationType.REPLY,
 									  senderMailAddress: sendAs,
-									  toRecipients: [
-										  createMailAddress({
+									  recipients: [
+										  {
 											  address: organizer.address,
 											  name: organizer.name,
-											  contact: null,
-										  }),
+										  },
 									  ],
-									  ccRecipients: [],
-									  bccRecipients: [],
 									  attachments: [],
 									  bodyText: body,
 									  subject: message,

@@ -27,11 +27,10 @@ import {createDraftCreateData} from "../../entities/tutanota/DraftCreateData"
 import {createDraftData} from "../../entities/tutanota/DraftData"
 import type {Mail} from "../../entities/tutanota/Mail"
 import {_TypeModel as MailTypeModel, MailTypeRef} from "../../entities/tutanota/Mail"
-import type {DraftRecipient} from "../../entities/tutanota/DraftRecipient"
+import {createDraftRecipient} from "../../entities/tutanota/DraftRecipient"
 import {createDraftUpdateData} from "../../entities/tutanota/DraftUpdateData"
 import type {SendDraftData} from "../../entities/tutanota/SendDraftData"
 import {createSendDraftData} from "../../entities/tutanota/SendDraftData"
-import type {RecipientDetails} from "../../common/RecipientInfo"
 import {RecipientsNotFoundError} from "../../common/error/RecipientsNotFoundError"
 import {NotFoundError} from "../../common/error/RestError"
 import {GroupRootTypeRef} from "../../entities/sys/GroupRoot"
@@ -67,7 +66,7 @@ import {createAttachmentKeyData} from "../../entities/tutanota/AttachmentKeyData
 import {assertWorkerOrNode, isApp} from "../../common/Env"
 import {TutanotaPropertiesTypeRef} from "../../entities/tutanota/TutanotaProperties"
 import {GroupInfoTypeRef} from "../../entities/sys/GroupInfo"
-import type {EncryptedMailAddress} from "../../entities/tutanota/EncryptedMailAddress"
+import {createEncryptedMailAddress} from "../../entities/tutanota/EncryptedMailAddress"
 import type {EntityUpdate} from "../../entities/sys/EntityUpdate"
 import type {PhishingMarker} from "../../entities/tutanota/PhishingMarker"
 import {EntityClient} from "../../common/EntityClient"
@@ -103,6 +102,8 @@ import {createReportMailPostData} from "../../entities/tutanota/ReportMailPostDa
 import {CounterService} from "../../entities/monitor/Services"
 import {PublicKeyService} from "../../entities/sys/Services"
 import {IServiceExecutor} from "../../common/ServiceRequest"
+import {PartialRecipient, Recipient, RecipientList, RecipientType} from "../../common/recipients/Recipient"
+import {Contact} from "../../entities/tutanota/Contact"
 
 assertWorkerOrNode()
 type Attachments = ReadonlyArray<TutanotaFile | DataFile | FileReference>
@@ -113,14 +114,14 @@ interface CreateDraftParams {
 	bodyText: string;
 	senderMailAddress: string;
 	senderName: string;
-	toRecipients: Array<DraftRecipient>;
-	ccRecipients: Array<DraftRecipient>;
-	bccRecipients: Array<DraftRecipient>;
+	toRecipients: RecipientList;
+	ccRecipients: RecipientList;
+	bccRecipients: RecipientList;
 	conversationType: ConversationType;
 	previousMessageId: Id | null;
 	attachments: Attachments | null;
 	confidential: boolean;
-	replyTos: Array<EncryptedMailAddress>;
+	replyTos: RecipientList;
 	method: MailMethod;
 }
 
@@ -129,9 +130,9 @@ interface UpdateDraftParams {
 	body: string;
 	senderMailAddress: string;
 	senderName: string;
-	toRecipients: Array<DraftRecipient>;
-	ccRecipients: Array<DraftRecipient>;
-	bccRecipients: Array<DraftRecipient>;
+	toRecipients: RecipientList;
+	ccRecipients: RecipientList;
+	bccRecipients: RecipientList;
 	attachments: Attachments | null;
 	confidential: boolean;
 	draft: Mail;
@@ -224,10 +225,10 @@ export class MailFacade {
 			senderName,
 			confidential,
 			method,
-			toRecipients,
-			ccRecipients,
-			bccRecipients,
-			replyTos,
+			toRecipients: toRecipients.map(recipientMapper(createDraftRecipient)),
+			ccRecipients: ccRecipients.map(recipientMapper(createDraftRecipient)),
+			bccRecipients: bccRecipients.map(recipientMapper(createDraftRecipient)),
+			replyTos: replyTos.map(recipientMapper(createEncryptedMailAddress)),
 			addedAttachments: await this._createAddedAttachments(attachments, [], mailGroupKey),
 		})
 		const createDraftReturn = await this.serviceExecutor.post(DraftService, service, {sessionKey: sk})
@@ -280,9 +281,9 @@ export class MailFacade {
 			senderName: senderName,
 			confidential: confidential,
 			method: draft.method,
-			toRecipients,
-			ccRecipients,
-			bccRecipients,
+			toRecipients: toRecipients.map(recipientMapper(createDraftRecipient)),
+			ccRecipients: ccRecipients.map(recipientMapper(createDraftRecipient)),
+			bccRecipients: bccRecipients.map(recipientMapper(createDraftRecipient)),
 			replyTos: draft.replyTos,
 			removedAttachments: this._getRemovedAttachments(attachments, draft.attachments),
 			addedAttachments: await this._createAddedAttachments(attachments, draft.attachments, mailGroupKey),
@@ -408,7 +409,7 @@ export class MailFacade {
 		return attachment
 	}
 
-	async sendDraft(draft: Mail, recipients: Array<RecipientDetails>, language: string): Promise<void> {
+	async sendDraft(draft: Mail, recipients: Array<Recipient>, language: string): Promise<void> {
 		const senderMailGroupId = await this._getMailGroupIdForMailAddress(this._login.getLoggedInUser(), draft.sender.address)
 		const bucketKey = aes128RandomKey()
 		const sendDraftData = createSendDraftData()
@@ -441,7 +442,7 @@ export class MailFacade {
 
 				if (draft.confidential) {
 					sendDraftData.bucketEncMailSessionKey = encryptKey(bucketKey, sk)
-					const hasExternalSecureRecipient = recipients.some(r => r.isExternal && !!r.password?.trim())
+					const hasExternalSecureRecipient = recipients.some(r => r.type === RecipientType.EXTERNAL && !!this.getContactPassword(r.contact)?.trim())
 
 					if (hasExternalSecureRecipient) {
 						sendDraftData.senderNameUnencrypted = draft.sender.name // needed for notification mail
@@ -546,32 +547,32 @@ export class MailFacade {
 		return this._phishingMarkers.has(hash)
 	}
 
-	async _addRecipientKeyData(bucketKey: Aes128Key, service: SendDraftData, recipients: Array<RecipientDetails>, senderMailGroupId: Id): Promise<void> {
+	async _addRecipientKeyData(bucketKey: Aes128Key, service: SendDraftData, recipients: Array<Recipient>, senderMailGroupId: Id): Promise<void> {
 		const notFoundRecipients: string[] = []
 
 		for (let recipient of recipients) {
-			if (recipient.mailAddress === "system@tutanota.de" || !recipient) {
-				notFoundRecipients.push(recipient.mailAddress)
+			if (recipient.address === "system@tutanota.de" || !recipient) {
+				notFoundRecipients.push(recipient.address)
 				continue
 			}
 
 			// copy password information if this is an external contact
 			// otherwise load the key information from the server
-			if (recipient.isExternal) {
-				const password = recipient.password
+			if (recipient.type === RecipientType.EXTERNAL) {
+				const password = this.getContactPassword(recipient.contact)
 
 				if (password == null || !isSameId(this._login.getGroupId(GroupType.Mail), senderMailGroupId)) {
 					// no password given and prevent sending to secure externals from shared group
-					notFoundRecipients.push(recipient.mailAddress)
+					notFoundRecipients.push(recipient.address)
 					continue
 				}
 
 				const salt = generateRandomSalt()
 				const passwordKey = generateKeyFromPassphrase(password, salt, KeyLength.b128)
 				const passwordVerifier = createAuthVerifier(passwordKey)
-				const externalGroupKeys = await this._getExternalGroupKey(recipient.mailAddress, passwordKey, passwordVerifier)
+				const externalGroupKeys = await this._getExternalGroupKey(recipient.address, passwordKey, passwordVerifier)
 				const data = createSecureExternalRecipientKeyData()
-				data.mailAddress = recipient.mailAddress
+				data.mailAddress = recipient.address
 				data.symEncBucketKey = null // legacy for old permission system, not used any more
 
 				data.ownerEncBucketKey = encryptKey(externalGroupKeys.externalMailGroupKey, bucketKey)
@@ -581,7 +582,7 @@ export class MailFacade {
 				data.pwEncCommunicationKey = encryptKey(passwordKey, externalGroupKeys.externalUserGroupKey)
 				service.secureExternalRecipientKeyData.push(data)
 			} else {
-				const keyData = await this._crypto.encryptBucketKeyForInternalRecipient(bucketKey, recipient.mailAddress, notFoundRecipients)
+				const keyData = await this._crypto.encryptBucketKeyForInternalRecipient(bucketKey, recipient.address, notFoundRecipients)
 
 				if (keyData) {
 					service.internalRecipientKeyData.push(keyData)
@@ -592,6 +593,10 @@ export class MailFacade {
 		if (notFoundRecipients.length > 0) {
 			throw new RecipientsNotFoundError(notFoundRecipients.join("\n"))
 		}
+	}
+
+	private getContactPassword(contact: Contact | null): string | null {
+		return contact?.presharedPassword ?? contact?.autoTransmitPassword ?? null
 	}
 
 	/**
@@ -764,4 +769,10 @@ function parseUrl(link: string): URL | null {
 function getUrlDomain(link: string): string | null {
 	const url = parseUrl(link)
 	return url && url.hostname
+}
+
+function recipientMapper<T>(mapper: (r: {name: string, address: string}) => T ): (recipient: PartialRecipient) => T {
+	return function({name, address}) {
+		return mapper({name: name ?? "", address})
+	}
 }

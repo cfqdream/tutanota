@@ -27,7 +27,6 @@ import type {CalendarInfo} from "../../../src/calendar/model/CalendarModel"
 import {CalendarModel} from "../../../src/calendar/model/CalendarModel"
 import {getAllDayDateUTCFromZone, getTimeZone} from "../../../src/calendar/date/CalendarUtils"
 import {DateTime} from "luxon"
-import {RecipientInfoType} from "../../../src/api/common/RecipientInfo"
 import {SendMailModel} from "../../../src/mail/editor/SendMailModel"
 import type {LoginController} from "../../../src/api/main/LoginController"
 import type {ContactModel} from "../../../src/contacts/model/ContactModel"
@@ -54,6 +53,7 @@ import {
 	makeUserController,
 } from "./CalendarTestUtils"
 import {createRepeatRule} from "../../../src/api/entities/sys/RepeatRule"
+import {RecipientType} from "../../../src/api/common/recipients/RecipientsModel.js";
 
 const now = new Date(2020, 4, 25, 13, 40)
 const zone = getTimeZone()
@@ -692,7 +692,7 @@ o.spec("CalendarEventViewModel", function () {
 				calendarModel,
 				distributor,
 			})
-			updateModel.bccRecipients()[0].type = RecipientInfoType.EXTERNAL
+			updateModel.bccRecipients()[0].type = RecipientType.EXTERNAL
 			await updateModel.bccRecipients()[0].resolveContactPromise
 			updateModel.bccRecipients()[0].contact = createContact({
 				presharedPassword: "123",
@@ -747,7 +747,7 @@ o.spec("CalendarEventViewModel", function () {
 				calendarModel,
 				distributor,
 			})
-			updateModel.bccRecipients()[0].type = RecipientInfoType.EXTERNAL
+			updateModel.bccRecipients()[0].type = RecipientType.EXTERNAL
 			await updateModel.bccRecipients()[0].resolveContactPromise
 			updateModel.bccRecipients()[0].contact = createContact({
 				presharedPassword: "123",
@@ -807,7 +807,7 @@ o.spec("CalendarEventViewModel", function () {
 				distributor,
 			})
 			viewModel.setStartDate(new Date(2020, 4, 3))
-			updateModel.bccRecipients()[0].type = RecipientInfoType.EXTERNAL
+			updateModel.bccRecipients()[0].type = RecipientType.EXTERNAL
 			await updateModel.bccRecipients()[0].resolveContactPromise
 			updateModel.bccRecipients()[0].contact = createContact({
 				presharedPassword: "123",
@@ -867,7 +867,7 @@ o.spec("CalendarEventViewModel", function () {
 				distributor,
 			})
 			viewModel.setStartDate(new Date(2020, 4, 3))
-			updateModel.bccRecipients()[0].type = RecipientInfoType.EXTERNAL
+			updateModel.bccRecipients()[0].type = RecipientType.EXTERNAL
 			await updateModel.bccRecipients()[0].resolveContactPromise
 			updateModel.bccRecipients()[0].contact = createContact({
 				presharedPassword: "123",
@@ -1409,7 +1409,7 @@ o.spec("CalendarEventViewModel", function () {
 				address: createEncryptedMailAddress({
 					address: "remove-attendee@example.com",
 				}),
-				type: RecipientInfoType.EXTERNAL,
+				type: RecipientType.EXTERNAL,
 				status: CalendarAttendeeStatus.ACCEPTED,
 			}
 			const toRemoveAttendee = createCalendarEventAttendee({
@@ -1488,7 +1488,7 @@ o.spec("CalendarEventViewModel", function () {
 				calendarModel,
 				distributor,
 			})
-			updateModel.bccRecipients()[0].type = RecipientInfoType.EXTERNAL
+			updateModel.bccRecipients()[0].type = RecipientType.EXTERNAL
 			await updateModel.bccRecipients()[0].resolveContactPromise
 			updateModel.bccRecipients()[0].contact = createContact({
 				presharedPassword: "123",
@@ -1543,7 +1543,7 @@ o.spec("CalendarEventViewModel", function () {
 				calendarModel,
 				distributor,
 			})
-			updateModel.bccRecipients()[0].type = RecipientInfoType.EXTERNAL
+			updateModel.bccRecipients()[0].type = RecipientType.EXTERNAL
 			viewModel.updatePassword(viewModel.attendees()[0], "123")
 			viewModel.setStartDate(new Date(2020, 4, 3))
 			askForUpdates = o.spy(() => Promise.resolve("yes"))
@@ -1576,7 +1576,7 @@ o.spec("CalendarEventViewModel", function () {
 				address: createEncryptedMailAddress({
 					address: "remove-attendee@example.com",
 				}),
-				type: RecipientInfoType.EXTERNAL,
+				type: RecipientType.EXTERNAL,
 				status: CalendarAttendeeStatus.ACCEPTED,
 			}
 			const toRemoveAttendee = createCalendarEventAttendee({
@@ -1637,7 +1637,7 @@ o.spec("CalendarEventViewModel", function () {
 				address: createEncryptedMailAddress({
 					address: "remove-attendee@example.com",
 				}),
-				type: RecipientInfoType.EXTERNAL,
+				type: RecipientType.EXTERNAL,
 				status: CalendarAttendeeStatus.ACCEPTED,
 			}
 			const toRemoveAttendee = createCalendarEventAttendee({
@@ -1696,7 +1696,7 @@ o.spec("CalendarEventViewModel", function () {
 				address: createEncryptedMailAddress({
 					address: "remove-attendee@example.com",
 				}),
-				type: RecipientInfoType.EXTERNAL,
+				type: RecipientType.EXTERNAL,
 				status: CalendarAttendeeStatus.ACCEPTED,
 			}
 			const toRemoveAttendee = createCalendarEventAttendee({
@@ -2330,20 +2330,20 @@ o.spec("CalendarEventViewModel", function () {
 			o(viewModel.attendees()).deepEquals([
 				{
 					address: encMailAddress,
-					type: RecipientInfoType.INTERNAL,
+					type: RecipientType.INTERNAL,
 					status: CalendarAttendeeStatus.ACCEPTED,
 				},
 				{
 					address: createEncryptedMailAddress({
 						address: newGuest,
 					}),
-					type: RecipientInfoType.UNKNOWN,
+					type: RecipientType.UNKNOWN,
 					//add guest does not wait for recipient info to be resolved
 					status: CalendarAttendeeStatus.ADDED,
 				},
 			])
 			await delay(resolveRecipientMs)
-			o(viewModel.attendees()[1].type).equals(RecipientInfoType.EXTERNAL)
+			o(viewModel.attendees()[1].type).equals(RecipientType.EXTERNAL)
 		})
 		o("to existing event", async function () {
 			const calendars = makeCalendars("own")
@@ -2359,20 +2359,20 @@ o.spec("CalendarEventViewModel", function () {
 			o(viewModel.attendees()).deepEquals([
 				{
 					address: encMailAddress,
-					type: RecipientInfoType.INTERNAL,
+					type: RecipientType.INTERNAL,
 					status: CalendarAttendeeStatus.ACCEPTED,
 				},
 				{
 					address: createEncryptedMailAddress({
 						address: newGuest,
 					}),
-					type: RecipientInfoType.UNKNOWN,
+					type: RecipientType.UNKNOWN,
 					//add guest does not wait for recipient info to be resolved
 					status: CalendarAttendeeStatus.ADDED,
 				},
 			])
 			await delay(resolveRecipientMs)
-			o(viewModel.attendees()[1].type).equals(RecipientInfoType.EXTERNAL)
+			o(viewModel.attendees()[1].type).equals(RecipientType.EXTERNAL)
 		})
 		o("to existing event as duplicate", async function () {
 			const calendars = makeCalendars("own")
@@ -2397,13 +2397,13 @@ o.spec("CalendarEventViewModel", function () {
 					address: createEncryptedMailAddress({
 						address: guest,
 					}),
-					type: RecipientInfoType.UNKNOWN,
+					type: RecipientType.UNKNOWN,
 					//new CalendarEventViewModel does not wait for recipient info to be resolved
 					status: CalendarAttendeeStatus.ADDED,
 				},
 			])
 			await delay(resolveRecipientMs)
-			o(viewModel.attendees()[0].type).equals(RecipientInfoType.EXTERNAL)
+			o(viewModel.attendees()[0].type).equals(RecipientType.EXTERNAL)
 		})
 	})
 	o.spec("selectGoing", function () {
@@ -2427,7 +2427,7 @@ o.spec("CalendarEventViewModel", function () {
 				{
 					address: ownAttendee.address,
 					status: CalendarAttendeeStatus.ACCEPTED,
-					type: RecipientInfoType.INTERNAL,
+					type: RecipientType.INTERNAL,
 				},
 			])
 		})
@@ -2452,18 +2452,18 @@ o.spec("CalendarEventViewModel", function () {
 			o(viewModel.attendees()).deepEquals([
 				{
 					address: encMailAddress,
-					type: RecipientInfoType.INTERNAL,
+					type: RecipientType.INTERNAL,
 					status: CalendarAttendeeStatus.DECLINED,
 				},
 				{
 					address: attendee.address,
-					type: RecipientInfoType.UNKNOWN,
+					type: RecipientType.UNKNOWN,
 					//new CalendarEventViewModel does not wait for recipient info to be resolved
 					status: CalendarAttendeeStatus.ADDED,
 				},
 			])
 			await delay(resolveRecipientMs)
-			o(viewModel.attendees()[1].type).equals(RecipientInfoType.EXTERNAL)
+			o(viewModel.attendees()[1].type).equals(RecipientType.EXTERNAL)
 		})
 		o("status of own attendee is changed selected in invite", async function () {
 			const calendars = makeCalendars("own")
@@ -2489,18 +2489,18 @@ o.spec("CalendarEventViewModel", function () {
 			o(viewModel.attendees()).deepEquals([
 				{
 					address: encMailAddress,
-					type: RecipientInfoType.INTERNAL,
+					type: RecipientType.INTERNAL,
 					status: CalendarAttendeeStatus.TENTATIVE,
 				},
 				{
 					address: attendee.address,
-					type: RecipientInfoType.UNKNOWN,
+					type: RecipientType.UNKNOWN,
 					//new CalendarEventViewModel does not wait for recipient info to be resolved
 					status: assertEnumValue(CalendarAttendeeStatus, attendee.status),
 				},
 			])
 			await delay(resolveRecipientMs)
-			o(viewModel.attendees()[1].type).equals(RecipientInfoType.EXTERNAL)
+			o(viewModel.attendees()[1].type).equals(RecipientType.EXTERNAL)
 		})
 	})
 	o.spec("canModifyOrganizer", function () {
@@ -2568,7 +2568,7 @@ o.spec("CalendarEventViewModel", function () {
 				address: createEncryptedMailAddress({
 					address: "remove-attendee@example.com",
 				}),
-				type: RecipientInfoType.EXTERNAL,
+				type: RecipientType.EXTERNAL,
 				status: CalendarAttendeeStatus.ACCEPTED,
 			}
 			const viewModel = await init({

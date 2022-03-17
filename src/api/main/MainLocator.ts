@@ -54,6 +54,7 @@ import {UsageTestController} from "@tutao/tutanota-usagetests"
 import {UsageTestModel} from "../../misc/UsageTestModel"
 import {deviceConfig} from "../../misc/DeviceConfig"
 import {IServiceExecutor} from "../common/ServiceRequest.js"
+import {RecipientsModel} from "./RecipientsModel"
 
 assertMainOrNode()
 
@@ -96,6 +97,7 @@ export interface IMainLocator {
 	readonly usageTestController: UsageTestController
 	readonly usageTestModel: UsageTestModel
 	readonly serviceExecutor: IServiceExecutor
+	readonly recipientsModel: RecipientsModel
 	readonly init: () => Promise<void>
 	readonly initialized: Promise<void>
 }
@@ -134,6 +136,7 @@ class MainLocator implements IMainLocator {
 	usageTestController!: UsageTestController
 	usageTestModel!: UsageTestModel
 	serviceExecutor!: IServiceExecutor
+	recipientsModel!: RecipientsModel
 
 	private _nativeInterfaces: NativeInterfaces | null = null
 
@@ -284,6 +287,7 @@ class MainLocator implements IMainLocator {
 		this.minimizedMailModel = new MinimizedMailEditorViewModel()
 		this.fileController = new FileController(this._nativeInterfaces?.fileApp ?? null)
 		this.usageTestController = new UsageTestController(this.usageTestModel)
+		this.recipientsModel = new RecipientsModel(this.contactModel, logins, this.mailFacade, this.entityClient)
 	}
 }
 

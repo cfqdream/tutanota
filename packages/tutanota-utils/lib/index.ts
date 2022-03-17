@@ -39,7 +39,10 @@ export {
 	partitionAsync,
 	arrayOf
 } from "./ArrayUtils.js"
-export {AsyncResult} from "./AsyncResult.js"
+export {
+	Async,
+	AsyncStatus
+} from "./Async.js"
 export {intersection} from "./CollectionUtils.js"
 export {
 	DAY_IN_MILLIS,

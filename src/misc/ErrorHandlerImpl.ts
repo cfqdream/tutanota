@@ -33,8 +33,8 @@ import {copyToClipboard} from "./ClipboardUtils"
 import {px} from "../gui/size"
 import {UserError} from "../api/main/UserError"
 import {showMoreStorageNeededOrderDialog} from "./SubscriptionDialogs"
-import {createDraftRecipient} from "../api/entities/tutanota/DraftRecipient"
 import {SessionType} from "../api/common/SessionType"
+import {RecipientType} from "../api/common/recipients/Recipient"
 import {showSnackBar} from "../gui/base/SnackBar"
 
 assertMainOrNode()
@@ -331,12 +331,10 @@ export async function sendFeedbackMail(content: FeedbackContent): Promise<void> 
 			bodyText: content.message.split("\n").join("<br>"),
 			senderMailAddress: neverNull(logins.getUserController().userGroupInfo.mailAddress),
 			senderName: "",
-			toRecipients: [
-				createDraftRecipient({
-					name,
-					mailAddress,
-				}),
-			],
+			toRecipients: [{
+				name,
+				address: mailAddress,
+			}],
 			ccRecipients: [],
 			bccRecipients: [],
 			conversationType: ConversationType.NEW,
@@ -352,9 +350,9 @@ export async function sendFeedbackMail(content: FeedbackContent): Promise<void> 
 		[
 			{
 				name,
-				mailAddress,
-				password: "",
-				isExternal: false,
+				address: mailAddress,
+				type: RecipientType.INTERNAL,
+				contact: null,
 			},
 		],
 		"de",

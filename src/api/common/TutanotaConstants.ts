@@ -956,3 +956,10 @@ export const enum ArchiveDataType {
 	MailBody = "2",
 	MailHeaders = "3"
 }
+
+export enum UsageTestParticipationMode {
+	Once = "0",
+	Unlimited = "1",
+}
+
+export const UsageTestParticipationModeToName = reverse(UsageTestParticipationMode)

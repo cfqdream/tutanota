@@ -28,9 +28,9 @@ export const _TypeModel: TypeModel = {
 			"final": false,
 			"encrypted": false
 		},
-		"state": {
-			"id": 1964,
-			"type": "Number",
+		"sendPings": {
+			"id": 1991,
+			"type": "Boolean",
 			"cardinality": "One",
 			"final": false,
 			"encrypted": false
@@ -73,7 +73,7 @@ export type UsageTestAssignment = {
 
 	_id: Id;
 	name: string;
-	state: NumberString;
+	sendPings: boolean;
 	testId: Id;
 	variant: null | NumberString;
 

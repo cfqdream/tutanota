@@ -60,7 +60,7 @@ o.spec("UsageTestModel", function () {
 		name: "oldAssignment",
 		variant: "3",
 		stages: [],
-		state: "0",
+		sendPings: true,
 		testId: "testId123",
 	})
 	const assignmentData: PersistedAssignmentData = {
@@ -73,7 +73,7 @@ o.spec("UsageTestModel", function () {
 		name: "assignment1",
 		variant: "1",
 		stages: [],
-		state: "1",
+		sendPings: true,
 		testId: "testId123",
 	})
 

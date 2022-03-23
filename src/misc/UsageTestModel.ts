@@ -1,7 +1,6 @@
 import {UsageTestAssignmentOut} from "../api/entities/sys/UsageTestAssignmentOut.js"
 import {PingAdapter, Stage, UsageTest} from "@tutao/tutanota-usagetests"
 import {createUsageTestParticipationIn} from "../api/entities/sys/UsageTestParticipationIn"
-import {UsageTestState} from "../api/common/TutanotaConstants"
 import {filterInt} from "@tutao/tutanota-utils"
 import {NotFoundError, PreconditionFailedError} from "../api/common/error/RestError"
 import {createUsageTestMetricData} from "../api/entities/sys/UsageTestMetricData"

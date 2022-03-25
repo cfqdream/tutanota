@@ -2,6 +2,7 @@ import {create} from "../../common/utils/EntityUtils.js"
 import {TypeRef, downcast} from "@tutao/tutanota-utils"
 import type {TypeModel} from "../../common/EntityTypes.js"
 
+import type {UsageTestMetricConfigValue} from "./UsageTestMetricConfigValue.js"
 
 export const UsageTestMetricConfigTypeRef: TypeRef<UsageTestMetricConfig> = new TypeRef("sys", "UsageTestMetricConfig")
 export const _TypeModel: TypeModel = {
@@ -35,7 +36,16 @@ export const _TypeModel: TypeModel = {
 			"encrypted": false
 		}
 	},
-	"associations": {},
+	"associations": {
+		"configValues": {
+			"id": 1996,
+			"type": "AGGREGATION",
+			"cardinality": "Any",
+			"final": false,
+			"refType": "UsageTestMetricConfigValue",
+			"dependency": null
+		}
+	},
 	"app": "sys",
 	"version": "74"
 }
@@ -50,4 +60,6 @@ export type UsageTestMetricConfig = {
 	_id: Id;
 	name: string;
 	type: NumberString;
+
+	configValues: UsageTestMetricConfigValue[];
 }

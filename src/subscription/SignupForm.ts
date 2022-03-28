@@ -22,12 +22,11 @@ import {showWorkerProgressDialog} from "../gui/dialogs/ProgressDialog"
 import {AccessDeactivatedError, AccessExpiredError, InvalidDataError} from "../api/common/error/RestError"
 import {createRegistrationCaptchaServiceGetData} from "../api/entities/sys/RegistrationCaptchaServiceGetData"
 import {deviceConfig} from "../misc/DeviceConfig"
-import {HttpMethod} from "../api/common/EntityFunctions"
-import {RegistrationCaptchaServiceReturnTypeRef} from "../api/entities/sys/RegistrationCaptchaServiceReturn"
 import {createRegistrationCaptchaServiceData} from "../api/entities/sys/RegistrationCaptchaServiceData"
 import {locator} from "../api/main/MainLocator"
 import {deleteCampaign} from "../misc/LoginUtils"
 import {CURRENT_PRIVACY_VERSION, CURRENT_TERMS_VERSION, renderTermsAndConditionsButton, TermsSection} from "./TermsAndConditions"
+import {UsageTest} from "@tutao/tutanota-usagetests"
 import {RegistrationCaptchaService} from "../api/entities/sys/Services"
 
 export type SignupFormAttrs = {
@@ -49,9 +48,15 @@ export class SignupForm implements Component<SignupFormAttrs> {
 	private _mailAddressFormErrorId: TranslationKey | null = null
 	private _mailAddress!: string
 	private _isMailVerificationBusy: boolean
+	private readonly __mailValid: Stream<boolean>
+	private __signupFreeTest?: UsageTest
 
 	constructor() {
-		this._passwordForm = new PasswordForm(false, true, true, "passwordImportance_msg")
+		this.__signupFreeTest = locator.usageTestController.getTest("signup.free")
+		this.__signupFreeTest.strictStageOrder = true
+
+		this.__mailValid = stream(false)
+		this._passwordForm = new PasswordForm(false, true, true, "passwordImportance_msg", this.__mailValid)
 		this._confirmTerms = stream(false)
 		this._confirmAge = stream(false)
 		this._code = stream("")
@@ -63,6 +68,8 @@ export class SignupForm implements Component<SignupFormAttrs> {
 		const mailAddressFormAttrs: SelectMailAddressFormAttrs = {
 			availableDomains: isTutanotaDomain() ? TUTANOTA_MAIL_ADDRESS_DOMAINS : getWhitelabelRegistrationDomains(),
 			onEmailChanged: (email, validationResult) => {
+				this.__mailValid(validationResult.isValid)
+
 				if (validationResult.isValid) {
 					this._mailAddress = email
 					this._mailAddressFormErrorId = null
@@ -101,6 +108,8 @@ export class SignupForm implements Component<SignupFormAttrs> {
 			const ageConfirmPromise = this._confirmAge() ? Promise.resolve(true) : Dialog.confirm("parentConfirmation_msg", "paymentDataValidation_action")
 			ageConfirmPromise.then(confirmed => {
 				if (confirmed) {
+					// Credentials confirmation (click on next)
+					this.__signupFreeTest?.getStage(4).complete()
 					return signup(
 						this._mailAddress,
 						this._passwordForm.getNewPassword(),

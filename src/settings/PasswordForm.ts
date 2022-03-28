@@ -8,6 +8,7 @@ import {lang} from "../misc/LanguageViewModel"
 import type {Status} from "../gui/base/StatusField"
 import {StatusField} from "../gui/base/StatusField"
 import stream from "mithril/stream"
+import Stream from "mithril/stream"
 import {logins} from "../api/main/LoginController"
 import {NotAuthenticatedError} from "../api/common/error/RestError"
 import {showProgressDialog} from "../gui/dialogs/ProgressDialog"
@@ -17,6 +18,7 @@ import {ofClass} from "@tutao/tutanota-utils"
 import {getEtId} from "../api/common/utils/EntityUtils"
 import {locator} from "../api/main/MainLocator"
 import {assertMainOrNode} from "../api/common/Env"
+import {UsageTest} from "@tutao/tutanota-usagetests"
 
 assertMainOrNode()
 
@@ -35,16 +37,22 @@ export class PasswordForm implements Component {
 	private readonly _validateOldPassword: boolean
 	private readonly _enforcePasswordStrength: boolean
 	private readonly _repeatPassword: boolean
+	private readonly __mailValid?: Stream<boolean>
+	private __signupFreeTest?: UsageTest
 
 	constructor(
 		validateOldPassword: boolean,
 		enforcePasswordStrength: boolean,
 		repeatPassword: boolean,
 		passwordInfoTextId?: TranslationKey,
+		mailValid?: Stream<boolean>,
 	) {
 		this._validateOldPassword = validateOldPassword
 		this._enforcePasswordStrength = enforcePasswordStrength
 		this._repeatPassword = repeatPassword
+		this.__mailValid = mailValid
+
+		this.__signupFreeTest = locator.usageTestController.getTest("signup.free")
 
 		// make sure both the input values and status fields are initialized correctly
 		this._onOldPasswordInput("")
@@ -96,7 +104,7 @@ export class PasswordForm implements Component {
 						this._oldPassword = ""
 						this._newPassword = ""
 						this._repeatedPassword = ""
-					},
+					}
 				},
 				[
 					validateOldPassword ? m(TextFieldN, oldPasswordFieldAttrs) : null,
@@ -225,7 +233,19 @@ export class PasswordForm implements Component {
 		}
 	}
 
+	_checkBothValidAndSendPing() {
+		if (this._newPasswordStatus.type === "valid" && this._repeatedPasswordStatus.type === "valid") {
+			// Password entry (both passwords entered and valid)
+			this.__signupFreeTest?.getStage(3).complete()
+		}
+	}
+
 	_onNewPasswordInput(newPassword: string): void {
+		if (this.__mailValid && this.__mailValid()) {
+			// Email address selection finished (email address is available and clicked in password field)
+			this.__signupFreeTest?.getStage(2).complete()
+		}
+
 		this._newPassword = newPassword
 
 		if (this._newPassword === "") {
@@ -256,6 +276,8 @@ export class PasswordForm implements Component {
 				text: "passwordValid_msg",
 			}
 		}
+
+		this._checkBothValidAndSendPing()
 	}
 
 	_onRepeatedPasswordInput(repeatedPassword: string): void {
@@ -277,5 +299,7 @@ export class PasswordForm implements Component {
 				text: "passwordValid_msg",
 			}
 		}
+
+		this._checkBothValidAndSendPing()
 	}
 }

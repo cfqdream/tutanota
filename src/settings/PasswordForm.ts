@@ -39,6 +39,7 @@ export class PasswordForm implements Component {
 	private readonly _repeatPassword: boolean
 	private readonly __mailValid?: Stream<boolean>
 	private __signupFreeTest?: UsageTest
+	private __signupPaidTest?: UsageTest
 
 	constructor(
 		validateOldPassword: boolean,
@@ -53,6 +54,7 @@ export class PasswordForm implements Component {
 		this.__mailValid = mailValid
 
 		this.__signupFreeTest = locator.usageTestController.getTest("signup.free")
+		this.__signupPaidTest = locator.usageTestController.getTest("signup.paid")
 
 		// make sure both the input values and status fields are initialized correctly
 		this._onOldPasswordInput("")
@@ -237,6 +239,7 @@ export class PasswordForm implements Component {
 		if (this._newPasswordStatus.type === "valid" && this._repeatedPasswordStatus.type === "valid") {
 			// Password entry (both passwords entered and valid)
 			this.__signupFreeTest?.getStage(3).complete()
+			this.__signupPaidTest?.getStage(2).complete()
 		}
 	}
 
@@ -244,6 +247,7 @@ export class PasswordForm implements Component {
 		if (this.__mailValid && this.__mailValid()) {
 			// Email address selection finished (email address is available and clicked in password field)
 			this.__signupFreeTest?.getStage(2).complete()
+			this.__signupPaidTest?.getStage(1).complete()
 		}
 
 		this._newPassword = newPassword

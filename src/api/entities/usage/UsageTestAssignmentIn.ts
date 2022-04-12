@@ -3,25 +3,25 @@ import {TypeRef, downcast} from "@tutao/tutanota-utils"
 import type {TypeModel} from "../../common/EntityTypes.js"
 
 
-export const UsageTestAssignmentInTypeRef: TypeRef<UsageTestAssignmentIn> = new TypeRef("sys", "UsageTestAssignmentIn")
+export const UsageTestAssignmentInTypeRef: TypeRef<UsageTestAssignmentIn> = new TypeRef("usage", "UsageTestAssignmentIn")
 export const _TypeModel: TypeModel = {
 	"name": "UsageTestAssignmentIn",
-	"since": 73,
+	"since": 1,
 	"type": "DATA_TRANSFER_TYPE",
-	"id": 1956,
-	"rootId": "A3N5cwAHpA",
+	"id": 56,
+	"rootId": "BXVzYWdlADg",
 	"versioned": false,
 	"encrypted": false,
 	"values": {
 		"_format": {
-			"id": 1957,
+			"id": 57,
 			"type": "Number",
 			"cardinality": "One",
 			"final": false,
 			"encrypted": false
 		},
 		"testDeviceId": {
-			"id": 1958,
+			"id": 58,
 			"type": "GeneratedId",
 			"cardinality": "ZeroOrOne",
 			"final": false,
@@ -29,8 +29,8 @@ export const _TypeModel: TypeModel = {
 		}
 	},
 	"associations": {},
-	"app": "sys",
-	"version": "74"
+	"app": "usage",
+	"version": "1"
 }
 
 export function createUsageTestAssignmentIn(values?: Partial<UsageTestAssignmentIn>): UsageTestAssignmentIn {

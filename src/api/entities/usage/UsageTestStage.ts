@@ -4,25 +4,25 @@ import type {TypeModel} from "../../common/EntityTypes.js"
 
 import type {UsageTestMetricConfig} from "./UsageTestMetricConfig.js"
 
-export const UsageTestStageTypeRef: TypeRef<UsageTestStage> = new TypeRef("sys", "UsageTestStage")
+export const UsageTestStageTypeRef: TypeRef<UsageTestStage> = new TypeRef("usage", "UsageTestStage")
 export const _TypeModel: TypeModel = {
 	"name": "UsageTestStage",
-	"since": 73,
+	"since": 1,
 	"type": "AGGREGATED_TYPE",
-	"id": 1939,
-	"rootId": "A3N5cwAHkw",
+	"id": 38,
+	"rootId": "BXVzYWdlACY",
 	"versioned": false,
 	"encrypted": false,
 	"values": {
 		"_id": {
-			"id": 1940,
+			"id": 39,
 			"type": "CustomId",
 			"cardinality": "One",
 			"final": true,
 			"encrypted": false
 		},
 		"name": {
-			"id": 1941,
+			"id": 40,
 			"type": "String",
 			"cardinality": "One",
 			"final": false,
@@ -31,7 +31,7 @@ export const _TypeModel: TypeModel = {
 	},
 	"associations": {
 		"metrics": {
-			"id": 1942,
+			"id": 41,
 			"type": "AGGREGATION",
 			"cardinality": "Any",
 			"final": false,
@@ -39,8 +39,8 @@ export const _TypeModel: TypeModel = {
 			"dependency": null
 		}
 	},
-	"app": "sys",
-	"version": "74"
+	"app": "usage",
+	"version": "1"
 }
 
 export function createUsageTestStage(values?: Partial<UsageTestStage>): UsageTestStage {

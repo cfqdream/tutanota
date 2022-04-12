@@ -9,6 +9,7 @@ import baseModelMap from "../entities/base/baseModelMap"
 import gossipModelMap from "../entities/gossip/gossipModelMap"
 import storageModelMap from "../entities/storage/storageModelMap"
 import type {TypeModel} from "./EntityTypes"
+import usageModelMap from "../entities/usage/usageModelMap"
 
 export const enum HttpMethod {
 	GET = "GET",
@@ -36,6 +37,7 @@ const modelMaps = {
 	accounting: accountingModelMap,
 	gossip: gossipModelMap,
 	storage: storageModelMap,
+	usage: usageModelMap,
 } as const
 
 export function resolveTypeReference(typeRef: TypeRef<any>): Promise<TypeModel> {

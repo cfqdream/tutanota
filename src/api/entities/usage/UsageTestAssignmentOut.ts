@@ -4,25 +4,25 @@ import type {TypeModel} from "../../common/EntityTypes.js"
 
 import type {UsageTestAssignment} from "./UsageTestAssignment.js"
 
-export const UsageTestAssignmentOutTypeRef: TypeRef<UsageTestAssignmentOut> = new TypeRef("sys", "UsageTestAssignmentOut")
+export const UsageTestAssignmentOutTypeRef: TypeRef<UsageTestAssignmentOut> = new TypeRef("usage", "UsageTestAssignmentOut")
 export const _TypeModel: TypeModel = {
 	"name": "UsageTestAssignmentOut",
-	"since": 73,
+	"since": 1,
 	"type": "DATA_TRANSFER_TYPE",
-	"id": 1966,
-	"rootId": "A3N5cwAHrg",
+	"id": 66,
+	"rootId": "BXVzYWdlAEI",
 	"versioned": false,
 	"encrypted": false,
 	"values": {
 		"_format": {
-			"id": 1967,
+			"id": 67,
 			"type": "Number",
 			"cardinality": "One",
 			"final": false,
 			"encrypted": false
 		},
 		"testDeviceId": {
-			"id": 1968,
+			"id": 68,
 			"type": "GeneratedId",
 			"cardinality": "One",
 			"final": false,
@@ -31,7 +31,7 @@ export const _TypeModel: TypeModel = {
 	},
 	"associations": {
 		"assignments": {
-			"id": 1969,
+			"id": 69,
 			"type": "AGGREGATION",
 			"cardinality": "Any",
 			"final": false,
@@ -39,8 +39,8 @@ export const _TypeModel: TypeModel = {
 			"dependency": null
 		}
 	},
-	"app": "sys",
-	"version": "74"
+	"app": "usage",
+	"version": "1"
 }
 
 export function createUsageTestAssignmentOut(values?: Partial<UsageTestAssignmentOut>): UsageTestAssignmentOut {

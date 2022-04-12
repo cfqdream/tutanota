@@ -4,39 +4,39 @@ import type {TypeModel} from "../../common/EntityTypes.js"
 
 import type {UsageTestMetricData} from "./UsageTestMetricData.js"
 
-export const UsageTestParticipationInTypeRef: TypeRef<UsageTestParticipationIn> = new TypeRef("sys", "UsageTestParticipationIn")
+export const UsageTestParticipationInTypeRef: TypeRef<UsageTestParticipationIn> = new TypeRef("usage", "UsageTestParticipationIn")
 export const _TypeModel: TypeModel = {
 	"name": "UsageTestParticipationIn",
-	"since": 73,
+	"since": 1,
 	"type": "DATA_TRANSFER_TYPE",
-	"id": 1983,
-	"rootId": "A3N5cwAHvw",
+	"id": 83,
+	"rootId": "BXVzYWdlAFM",
 	"versioned": false,
 	"encrypted": false,
 	"values": {
 		"_format": {
-			"id": 1984,
+			"id": 84,
 			"type": "Number",
 			"cardinality": "One",
 			"final": false,
 			"encrypted": false
 		},
 		"stage": {
-			"id": 1986,
+			"id": 86,
 			"type": "Number",
 			"cardinality": "One",
 			"final": false,
 			"encrypted": false
 		},
 		"testDeviceId": {
-			"id": 1987,
+			"id": 87,
 			"type": "GeneratedId",
 			"cardinality": "One",
 			"final": false,
 			"encrypted": false
 		},
 		"testId": {
-			"id": 1985,
+			"id": 85,
 			"type": "GeneratedId",
 			"cardinality": "One",
 			"final": false,
@@ -45,7 +45,7 @@ export const _TypeModel: TypeModel = {
 	},
 	"associations": {
 		"metrics": {
-			"id": 1988,
+			"id": 88,
 			"type": "AGGREGATION",
 			"cardinality": "Any",
 			"final": false,
@@ -53,8 +53,8 @@ export const _TypeModel: TypeModel = {
 			"dependency": null
 		}
 	},
-	"app": "sys",
-	"version": "74"
+	"app": "usage",
+	"version": "1"
 }
 
 export function createUsageTestParticipationIn(values?: Partial<UsageTestParticipationIn>): UsageTestParticipationIn {

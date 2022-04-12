@@ -1,15 +1,15 @@
 import o from "ospec"
 import {ASSIGNMENT_UPDATE_INTERVAL_MS, PersistedAssignmentData, TtlBehavior, UsageTestModel, UsageTestStorage} from "../../../src/misc/UsageTestModel"
-import {_TypeModel as UsageTestTypeModel, createUsageTestAssignment} from "../../../src/api/entities/sys/UsageTestAssignment"
+import {_TypeModel as UsageTestTypeModel, createUsageTestAssignment} from "../../../src/api/entities/usage/UsageTestAssignment"
 import {matchers, object, verify, when} from "testdouble"
-import {createUsageTestAssignmentIn} from "../../../src/api/entities/sys/UsageTestAssignmentIn"
-import {createUsageTestAssignmentOut} from "../../../src/api/entities/sys/UsageTestAssignmentOut"
-import {clone} from "@tutao/tutanota-utils"
+import {createUsageTestAssignmentIn} from "../../../src/api/entities/usage/UsageTestAssignmentIn"
+import {createUsageTestAssignmentOut} from "../../../src/api/entities/usage/UsageTestAssignmentOut"
+import {clone, filterInt} from "@tutao/tutanota-utils"
 import {Stage, UsageTest} from "@tutao/tutanota-usagetests"
-import {createUsageTestParticipationIn} from "../../../src/api/entities/sys/UsageTestParticipationIn"
-import {createUsageTestMetricData} from "../../../src/api/entities/sys/UsageTestMetricData"
+import {createUsageTestParticipationIn} from "../../../src/api/entities/usage/UsageTestParticipationIn"
+import {createUsageTestMetricData} from "../../../src/api/entities/usage/UsageTestMetricData"
 import {SuspensionBehavior} from "../../../src/api/worker/rest/RestClient"
-import {UsageTestAssignmentService, UsageTestParticipationService} from "../../../src/api/entities/sys/Services"
+import {UsageTestAssignmentService, UsageTestParticipationService} from "../../../src/api/entities/usage/Services"
 import {IServiceExecutor} from "../../../src/api/common/ServiceRequest"
 
 const {anything} = matchers
@@ -65,7 +65,7 @@ o.spec("UsageTestModel", function () {
 	})
 	const assignmentData: PersistedAssignmentData = {
 		updatedAt: dateProvider.now() - (ASSIGNMENT_UPDATE_INTERVAL_MS * 2),
-		sysModelVersion: Number(UsageTestTypeModel.version),
+		usageModelVersion: filterInt(UsageTestTypeModel.version),
 		assignments: [oldAssignment],
 	}
 
@@ -112,7 +112,7 @@ o.spec("UsageTestModel", function () {
 				await mockStorage.storeTestDeviceId(testDeviceId)
 				await mockStorage.storeAssignments({
 					assignments: [],
-					sysModelVersion: 1, // definitely outdated!
+					usageModelVersion: -1, // definitely outdated!
 					updatedAt: dateProvider.now() - 1,
 				})
 

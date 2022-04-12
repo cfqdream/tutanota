@@ -1,22 +1,21 @@
-import {UsageTestAssignmentOut} from "../api/entities/sys/UsageTestAssignmentOut.js"
+import {UsageTestAssignmentOut} from "../api/entities/usage/UsageTestAssignmentOut.js"
 import {PingAdapter, Stage, UsageTest} from "@tutao/tutanota-usagetests"
-import {createUsageTestParticipationIn} from "../api/entities/sys/UsageTestParticipationIn"
+import {createUsageTestParticipationIn} from "../api/entities/usage/UsageTestParticipationIn"
 import {filterInt} from "@tutao/tutanota-utils"
 import {NotFoundError, PreconditionFailedError} from "../api/common/error/RestError"
-import {createUsageTestMetricData} from "../api/entities/sys/UsageTestMetricData"
-import {_TypeModel as UsageTestTypeModel, UsageTestAssignment} from "../api/entities/sys/UsageTestAssignment"
+import {createUsageTestMetricData} from "../api/entities/usage/UsageTestMetricData"
+import {_TypeModel as UsageTestTypeModel, UsageTestAssignment} from "../api/entities/usage/UsageTestAssignment"
 import {SuspensionError} from "../api/common/error/SuspensionError"
 import {SuspensionBehavior} from "../api/worker/rest/RestClient"
 import {DateProvider} from "../api/common/DateProvider.js"
-import {isTest} from "../api/common/Env"
 import {IServiceExecutor} from "../api/common/ServiceRequest"
-import {createUsageTestAssignmentIn} from "../api/entities/sys/UsageTestAssignmentIn"
-import {UsageTestAssignmentService, UsageTestParticipationService} from "../api/entities/sys/Services"
+import {createUsageTestAssignmentIn} from "../api/entities/usage/UsageTestAssignmentIn"
+import {UsageTestAssignmentService, UsageTestParticipationService} from "../api/entities/usage/Services"
 
 export interface PersistedAssignmentData {
 	updatedAt: number
 	assignments: UsageTestAssignment[]
-	sysModelVersion: number
+	usageModelVersion: number
 }
 
 export interface UsageTestStorage {
@@ -53,7 +52,7 @@ export class UsageTestModel implements PingAdapter {
 		const persistedData = await this.testStorage.getAssignments()
 
 		if (persistedData == null ||
-			persistedData.sysModelVersion !== filterInt(UsageTestTypeModel.version) ||
+			persistedData.usageModelVersion !== filterInt(UsageTestTypeModel.version) ||
 			(ttlBehavior === TtlBehavior.UpToDateOnly && Date.now() - persistedData.updatedAt > ASSIGNMENT_UPDATE_INTERVAL_MS)
 		) {
 			return this.assignmentsToTests(await this.loadAssignments())
@@ -81,7 +80,7 @@ export class UsageTestModel implements PingAdapter {
 			await this.testStorage.storeAssignments({
 				assignments: response.assignments,
 				updatedAt: this.dateProvider.now(),
-				sysModelVersion: filterInt(UsageTestTypeModel.version),
+				usageModelVersion: filterInt(UsageTestTypeModel.version),
 			})
 
 			return response.assignments
@@ -162,7 +161,7 @@ export class UsageTestModel implements PingAdapter {
 				if (storedAssignments) {
 					await this.testStorage.storeAssignments({
 						updatedAt: storedAssignments.updatedAt,
-						sysModelVersion: storedAssignments.sysModelVersion,
+						usageModelVersion: storedAssignments.usageModelVersion,
 						assignments: storedAssignments.assignments.filter(assignment => assignment.testId !== test.testId),
 					})
 				}

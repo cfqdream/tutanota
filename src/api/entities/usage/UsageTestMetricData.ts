@@ -3,32 +3,32 @@ import {TypeRef, downcast} from "@tutao/tutanota-utils"
 import type {TypeModel} from "../../common/EntityTypes.js"
 
 
-export const UsageTestMetricDataTypeRef: TypeRef<UsageTestMetricData> = new TypeRef("sys", "UsageTestMetricData")
+export const UsageTestMetricDataTypeRef: TypeRef<UsageTestMetricData> = new TypeRef("usage", "UsageTestMetricData")
 export const _TypeModel: TypeModel = {
 	"name": "UsageTestMetricData",
-	"since": 73,
+	"since": 1,
 	"type": "AGGREGATED_TYPE",
-	"id": 1921,
-	"rootId": "A3N5cwAHgQ",
+	"id": 20,
+	"rootId": "BXVzYWdlABQ",
 	"versioned": false,
 	"encrypted": false,
 	"values": {
 		"_id": {
-			"id": 1922,
+			"id": 21,
 			"type": "CustomId",
 			"cardinality": "One",
 			"final": true,
 			"encrypted": false
 		},
 		"name": {
-			"id": 1923,
+			"id": 22,
 			"type": "String",
 			"cardinality": "One",
 			"final": true,
 			"encrypted": false
 		},
 		"value": {
-			"id": 1924,
+			"id": 23,
 			"type": "String",
 			"cardinality": "One",
 			"final": true,
@@ -36,8 +36,8 @@ export const _TypeModel: TypeModel = {
 		}
 	},
 	"associations": {},
-	"app": "sys",
-	"version": "74"
+	"app": "usage",
+	"version": "1"
 }
 
 export function createUsageTestMetricData(values?: Partial<UsageTestMetricData>): UsageTestMetricData {

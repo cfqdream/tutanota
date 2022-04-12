@@ -74,9 +74,6 @@ import {UpdateAdminshipDataTypeRef} from "./UpdateAdminshipData.js"
 import {UpdatePermissionKeyDataTypeRef} from "./UpdatePermissionKeyData.js"
 import {UpgradePriceServiceDataTypeRef} from "./UpgradePriceServiceData.js"
 import {UpgradePriceServiceReturnTypeRef} from "./UpgradePriceServiceReturn.js"
-import {UsageTestAssignmentInTypeRef} from "./UsageTestAssignmentIn.js"
-import {UsageTestAssignmentOutTypeRef} from "./UsageTestAssignmentOut.js"
-import {UsageTestParticipationInTypeRef} from "./UsageTestParticipationIn.js"
 import {UserIdDataTypeRef} from "./UserIdData.js"
 import {UserIdReturnTypeRef} from "./UserIdReturn.js"
 import {UserDataTypeRef} from "./UserData.js"
@@ -450,24 +447,6 @@ export const UpgradePriceService = Object.freeze({
 	name: "UpgradePriceService",
 	get: {data: UpgradePriceServiceDataTypeRef, return: UpgradePriceServiceReturnTypeRef},
 	post: null,
-	put: null,
-	delete: null,
-} as const)
-
-export const UsageTestAssignmentService = Object.freeze({
-	app: "sys",
-	name: "UsageTestAssignmentService",
-	get: null,
-	post: {data: UsageTestAssignmentInTypeRef, return: UsageTestAssignmentOutTypeRef},
-	put: {data: UsageTestAssignmentInTypeRef, return: UsageTestAssignmentOutTypeRef},
-	delete: null,
-} as const)
-
-export const UsageTestParticipationService = Object.freeze({
-	app: "sys",
-	name: "UsageTestParticipationService",
-	get: null,
-	post: {data: UsageTestParticipationInTypeRef, return: null},
 	put: null,
 	delete: null,
 } as const)

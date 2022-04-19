@@ -1,6 +1,6 @@
-import {CacheStorage, Range} from "./EntityRestCache"
-import {ProgrammingError} from "../../common/error/ProgrammingError"
-import {ListElementEntity, SomeEntity} from "../../common/EntityTypes"
+import {CacheStorage, CacheRange} from "./EntityRestCache"
+import {ProgrammingError} from "../../../common/error/ProgrammingError"
+import {ListElementEntity, SomeEntity} from "../../../common/EntityTypes"
 import {TypeRef} from "@tutao/tutanota-utils"
 
 export type StorageInitArgs = {persistent: true, databaseKey: Uint8Array, userId: Id} | {persistent: false}
@@ -63,7 +63,7 @@ export class LateInitializedCacheStorageImpl implements LateInitializedCacheStor
 		return this.inner.getLastUpdateTime()
 	}
 
-	getRangeForList<T extends ListElementEntity>(typeRef: TypeRef<T>, listId: Id): Promise<Range | null> {
+	getRangeForList<T extends ListElementEntity>(typeRef: TypeRef<T>, listId: Id): Promise<CacheRange | null> {
 		return this.inner.getRangeForList(typeRef, listId)
 	}
 

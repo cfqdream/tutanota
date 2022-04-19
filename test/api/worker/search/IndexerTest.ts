@@ -19,7 +19,7 @@ import {WhitelabelChildTypeRef} from "../../../../src/api/entities/sys/Whitelabe
 import {GENERATED_MAX_ID, generatedIdToTimestamp, getElementId, timestampToGeneratedId,} from "../../../../src/api/common/utils/EntityUtils"
 import {daysToMillis, defer, downcast, TypeRef} from "@tutao/tutanota-utils"
 import {aes128RandomKey, aes256Encrypt, aes256RandomKey, decrypt256Key, encrypt256Key, fixedIv, IV_BYTE_LENGTH, random,} from "@tutao/tutanota-crypto"
-import {EntityRestCache} from "../../../../src/api/worker/rest/EntityRestCache"
+import {EntityRestCache} from "../../../../src/api/worker/rest/cache/EntityRestCache.js"
 import o from "ospec"
 
 const SERVER_TIME = new Date("1994-06-08").getTime()

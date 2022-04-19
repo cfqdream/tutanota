@@ -21,7 +21,7 @@ import {IndexerCore} from "./IndexerCore"
 import {ElementDataOS, GroupDataOS, Metadata, MetaDataOS} from "./Indexer"
 import type {WorkerImpl} from "../WorkerImpl"
 import {DbError} from "../../common/error/DbError"
-import {EntityRestCache} from "../rest/EntityRestCache"
+import {EntityRestCache} from "../rest/cache/EntityRestCache.js"
 import type {DateProvider} from "../DateProvider"
 import type {EntityUpdate} from "../../entities/sys/EntityUpdate"
 import type {User} from "../../entities/sys/User"
@@ -31,7 +31,7 @@ import {EntityClient} from "../../common/EntityClient"
 import {ProgressMonitor} from "../../common/utils/ProgressMonitor"
 import type {SomeEntity} from "../../common/EntityTypes"
 import {EntityUpdateData} from "../../main/EventController";
-import {EphemeralCacheStorage} from "../rest/EphemeralCacheStorage";
+import {EphemeralCacheStorage} from "../rest/cache/EphemeralCacheStorage.js";
 import {IndexingErrorReason} from "./SearchTypes"
 
 export const INITIAL_MAIL_INDEX_INTERVAL_DAYS = 28

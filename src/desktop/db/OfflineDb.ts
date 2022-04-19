@@ -2,7 +2,7 @@ import {Database, default as sqlite} from "better-sqlite3"
 import {firstBiggerThanSecond} from "../../api/common/utils/EntityUtils"
 import {uint8ArrayToBase64} from "@tutao/tutanota-utils"
 import {bitArrayToUint8Array, CryptoError} from "@tutao/tutanota-crypto"
-import {OfflineDbMeta} from "../../api/worker/rest/OfflineStorage"
+import {OfflineDbMeta} from "../../api/worker/rest/cache/OfflineStorage.js"
 
 export interface PersistedEntity {
 	type: string,

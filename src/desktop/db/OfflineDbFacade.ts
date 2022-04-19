@@ -1,5 +1,5 @@
 import {OfflineDb, PersistedEntity} from "./OfflineDb"
-import {OfflineDbMeta} from "../../api/worker/rest/OfflineStorage"
+import {OfflineDbMeta} from "../../api/worker/rest/cache/OfflineStorage"
 
 export class OfflineDbFacade {
 	constructor(

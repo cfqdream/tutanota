@@ -1,26 +1,26 @@
-import type {EntityRestInterface} from "./EntityRestClient"
-import {EntityRestClient} from "./EntityRestClient"
-import {resolveTypeReference} from "../../common/EntityFunctions"
-import {OperationType} from "../../common/TutanotaConstants"
+import type {EntityRestInterface} from "../EntityRestClient"
+import {EntityRestClient} from "../EntityRestClient"
+import {resolveTypeReference} from "../../../common/EntityFunctions"
+import {OperationType} from "../../../common/TutanotaConstants"
 import {assertNotNull, firstThrow, flat, groupBy, isSameTypeRef, lastThrow, TypeRef} from "@tutao/tutanota-utils"
-import {containsEventOfType, getEventOfType} from "../../common/utils/Utils"
-import {PermissionTypeRef} from "../../entities/sys/Permission"
-import {EntityEventBatchTypeRef} from "../../entities/sys/EntityEventBatch"
-import {ValueType} from "../../common/EntityConstants"
-import {SessionTypeRef} from "../../entities/sys/Session"
-import {BucketPermissionTypeRef} from "../../entities/sys/BucketPermission"
-import {SecondFactorTypeRef} from "../../entities/sys/SecondFactor"
-import {RecoverCodeTypeRef} from "../../entities/sys/RecoverCode"
-import {NotAuthorizedError, NotFoundError} from "../../common/error/RestError"
-import {MailTypeRef} from "../../entities/tutanota/Mail"
-import type {EntityUpdate} from "../../entities/sys/EntityUpdate"
-import {RejectedSenderTypeRef} from "../../entities/sys/RejectedSender"
-import {firstBiggerThanSecond, GENERATED_MAX_ID, GENERATED_MIN_ID, getElementId} from "../../common/utils/EntityUtils";
-import {ProgrammingError} from "../../common/error/ProgrammingError"
-import {assertWorkerOrNode, isDesktop} from "../../common/Env"
-import type {ListElementEntity, SomeEntity} from "../../common/EntityTypes"
-import {EntityUpdateData} from "../../main/EventController"
-import {QueuedBatch} from "../search/EventQueue"
+import {containsEventOfType, getEventOfType} from "../../../common/utils/Utils"
+import {PermissionTypeRef} from "../../../entities/sys/Permission"
+import {EntityEventBatchTypeRef} from "../../../entities/sys/EntityEventBatch"
+import {ValueType} from "../../../common/EntityConstants"
+import {SessionTypeRef} from "../../../entities/sys/Session"
+import {BucketPermissionTypeRef} from "../../../entities/sys/BucketPermission"
+import {SecondFactorTypeRef} from "../../../entities/sys/SecondFactor"
+import {RecoverCodeTypeRef} from "../../../entities/sys/RecoverCode"
+import {NotAuthorizedError, NotFoundError} from "../../../common/error/RestError"
+import {MailTypeRef} from "../../../entities/tutanota/Mail"
+import type {EntityUpdate} from "../../../entities/sys/EntityUpdate"
+import {RejectedSenderTypeRef} from "../../../entities/sys/RejectedSender"
+import {firstBiggerThanSecond, GENERATED_MAX_ID, GENERATED_MIN_ID, getElementId} from "../../../common/utils/EntityUtils";
+import {ProgrammingError} from "../../../common/error/ProgrammingError"
+import {assertWorkerOrNode, isDesktop} from "../../../common/Env"
+import type {ListElementEntity, SomeEntity} from "../../../common/EntityTypes"
+import {EntityUpdateData} from "../../../main/EventController"
+import {QueuedBatch} from "../../search/EventQueue"
 
 
 assertWorkerOrNode()
@@ -64,7 +64,7 @@ export interface IEntityRestCache extends EntityRestInterface {
 }
 
 
-export type Range = {lower: Id, upper: Id}
+export type CacheRange = {lower: Id, upper: Id}
 
 export interface CacheStorage {
 
@@ -88,7 +88,7 @@ export interface CacheStorage {
 	 */
 	provideFromRange<T extends ListElementEntity>(typeRef: TypeRef<T>, listId: Id, start: Id, count: number, reverse: boolean): Promise<T[]>;
 
-	getRangeForList<T extends ListElementEntity>(typeRef: TypeRef<T>, listId: Id): Promise<Range | null>;
+	getRangeForList<T extends ListElementEntity>(typeRef: TypeRef<T>, listId: Id): Promise<CacheRange | null>;
 
 	setUpperRangeForList<T extends ListElementEntity>(typeRef: TypeRef<T>, listId: Id, id: Id): Promise<void>;
 
@@ -707,7 +707,7 @@ export function getUpdateInstanceId(update: EntityUpdate): {instanceListId: Id |
 /**
  * Check if a range request begins inside of an existing range
  */
-function isStartIdWithinRange(range: Range, startId: Id): boolean {
+function isStartIdWithinRange(range: CacheRange, startId: Id): boolean {
 	return !firstBiggerThanSecond(startId, range.upper) && !firstBiggerThanSecond(range.lower, startId)
 }
 
@@ -715,7 +715,7 @@ function isStartIdWithinRange(range: Range, startId: Id): boolean {
  * Check if a range request is going away from an existing range
  * Assumes that the range request doesn't start inside the range
  */
-function isRangeRequestAwayFromExistingRange(range: Range, reverse: boolean, start: string) {
+function isRangeRequestAwayFromExistingRange(range: CacheRange, reverse: boolean, start: string) {
 	return reverse
 		? firstBiggerThanSecond(range.lower, start)
 		: firstBiggerThanSecond(start, range.upper)

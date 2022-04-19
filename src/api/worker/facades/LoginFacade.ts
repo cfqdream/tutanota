@@ -99,7 +99,7 @@ import {Aes128Key} from "@tutao/tutanota-crypto/dist/encryption/Aes"
 import {EntropyService} from "../../entities/tutanota/Services"
 import {IServiceExecutor} from "../../common/ServiceRequest"
 import {SessionType} from "../../common/SessionType"
-import {LateInitializedCacheStorage} from "../rest/CacheStorageProxy"
+import {LateInitializedCacheStorage} from "../rest/cache/CacheStorageProxy.js"
 import {CustomerTypeRef} from "../../entities/sys/Customer"
 
 assertWorkerOrNode()

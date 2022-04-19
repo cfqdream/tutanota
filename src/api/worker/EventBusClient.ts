@@ -33,7 +33,7 @@ import {NoopProgressMonitor} from "../common/utils/ProgressMonitor"
 import {compareOldestFirst, firstBiggerThanSecond, GENERATED_MAX_ID, GENERATED_MIN_ID, getElementId, isSameId} from "../common/utils/EntityUtils"
 import {InstanceMapper} from "./crypto/InstanceMapper"
 import {WsConnectionState} from "../main/WorkerClient";
-import {IEntityRestCache} from "./rest/EntityRestCache"
+import {IEntityRestCache} from "./rest/cache/EntityRestCache.js"
 import {SleepDetector} from "./utils/SleepDetector.js"
 
 assertWorkerOrNode()

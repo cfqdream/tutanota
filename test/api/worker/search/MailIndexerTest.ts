@@ -49,7 +49,7 @@ import {EntityRestClientMock} from "../EntityRestClientMock"
 import type {DateProvider} from "../../../../src/api/worker/DateProvider"
 import {LocalTimeDateProvider} from "../../../../src/api/worker/DateProvider"
 import {aes256RandomKey, fixedIv} from "@tutao/tutanota-crypto"
-import {EntityRestCache} from "../../../../src/api/worker/rest/EntityRestCache"
+import {EntityRestCache} from "../../../../src/api/worker/rest/cache/EntityRestCache.js"
 
 class FixedDateProvider implements DateProvider {
     now: number

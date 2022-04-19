@@ -1,33 +1,33 @@
 import o from "ospec"
-import {CacheStorage, EntityRestCache, expandId, EXTEND_RANGE_MIN_CHUNK_SIZE} from "../../../src/api/worker/rest/EntityRestCache"
-import type {MailBody} from "../../../src/api/entities/tutanota/MailBody"
-import {createMailBody, MailBodyTypeRef} from "../../../src/api/entities/tutanota/MailBody"
-import {OperationType} from "../../../src/api/common/TutanotaConstants"
-import type {EntityUpdate} from "../../../src/api/entities/sys/EntityUpdate"
-import {createEntityUpdate} from "../../../src/api/entities/sys/EntityUpdate"
-import type {Mail} from "../../../src/api/entities/tutanota/Mail"
-import {createMail, MailTypeRef} from "../../../src/api/entities/tutanota/Mail"
+import {CacheStorage, EntityRestCache, expandId, EXTEND_RANGE_MIN_CHUNK_SIZE} from "../../../../src/api/worker/rest/cache/EntityRestCache.js"
+import type {MailBody} from "../../../../src/api/entities/tutanota/MailBody"
+import {createMailBody, MailBodyTypeRef} from "../../../../src/api/entities/tutanota/MailBody"
+import {OperationType} from "../../../../src/api/common/TutanotaConstants"
+import type {EntityUpdate} from "../../../../src/api/entities/sys/EntityUpdate"
+import {createEntityUpdate} from "../../../../src/api/entities/sys/EntityUpdate"
+import type {Mail} from "../../../../src/api/entities/tutanota/Mail"
+import {createMail, MailTypeRef} from "../../../../src/api/entities/tutanota/Mail"
 import {arrayOf, assertNotNull, clone, downcast, isSameTypeRef, neverNull, TypeRef} from "@tutao/tutanota-utils"
-import {createExternalUserReference, ExternalUserReferenceTypeRef} from "../../../src/api/entities/sys/ExternalUserReference"
-import {NotAuthorizedError, NotFoundError} from "../../../src/api/common/error/RestError"
-import {EntityRestClient, typeRefToPath} from "../../../src/api/worker/rest/EntityRestClient"
-import {CUSTOM_MIN_ID, GENERATED_MAX_ID, GENERATED_MIN_ID, getElementId, getListId, stringToCustomId} from "../../../src/api/common/utils/EntityUtils";
-import {ContactTypeRef, createContact} from "../../../src/api/entities/tutanota/Contact"
-import {createCustomer, CustomerTypeRef} from "../../../src/api/entities/sys/Customer"
+import {createExternalUserReference, ExternalUserReferenceTypeRef} from "../../../../src/api/entities/sys/ExternalUserReference"
+import {NotAuthorizedError, NotFoundError} from "../../../../src/api/common/error/RestError"
+import {EntityRestClient, typeRefToPath} from "../../../../src/api/worker/rest/EntityRestClient"
+import {CUSTOM_MIN_ID, GENERATED_MAX_ID, GENERATED_MIN_ID, getElementId, getListId, stringToCustomId} from "../../../../src/api/common/utils/EntityUtils";
+import {ContactTypeRef, createContact} from "../../../../src/api/entities/tutanota/Contact"
+import {createCustomer, CustomerTypeRef} from "../../../../src/api/entities/sys/Customer"
 import {assertThrows, mockAttribute, unmockAttribute} from "@tutao/tutanota-test-utils"
-import {createPermission, PermissionTypeRef} from "../../../src/api/entities/sys/Permission"
-import {EphemeralCacheStorage} from "../../../src/api/worker/rest/EphemeralCacheStorage"
-import {QueuedBatch} from "../../../src/api/worker/search/EventQueue"
+import {createPermission, PermissionTypeRef} from "../../../../src/api/entities/sys/Permission"
+import {EphemeralCacheStorage} from "../../../../src/api/worker/rest/cache/EphemeralCacheStorage.js"
+import {QueuedBatch} from "../../../../src/api/worker/search/EventQueue"
 import {matchers, object, when} from "testdouble"
-import {OfflineStorage} from "../../../src/api/worker/rest/OfflineStorage"
+import {OfflineStorage} from "../../../../src/api/worker/rest/cache/OfflineStorage.js"
 
 const {anything} = matchers
 
 const offlineDatabaseTestKey = [3957386659, 354339016, 3786337319, 3366334248]
 
 async function getOfflineStorage(userId: Id): Promise<CacheStorage> {
-	const {OfflineDbFacade} = await import("../../../src/desktop/db/OfflineDbFacade.js")
-	const {OfflineDb} = await import("../../../src/desktop/db/OfflineDb.js")
+	const {OfflineDbFacade} = await import("../../../../src/desktop/db/OfflineDbFacade.js")
+	const {OfflineDb} = await import("../../../../src/desktop/db/OfflineDb.js")
 	const offlineDbFactory = async (userId: string, key) => {
 		assertNotNull(userId)
 		// Added by sqliteNativeBannerPlugin

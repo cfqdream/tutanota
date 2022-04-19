@@ -299,3 +299,15 @@ export function isValidGeneratedId(id: Id | IdTuple): boolean {
 export function isElementEntity(e: SomeEntity): e is ElementEntity {
 	return typeof e._id === "string"
 }
+
+/**
+ * Get the creation timestamp of an entity, based on it's ID. only valid for types that have a generated ID
+ * @param entity
+ */
+export function getEntityCreationTimestamp(entity: SomeEntity): number {
+	if (entity._id instanceof Array) {
+		return generatedIdToTimestamp(entity._id[1])
+	} else {
+		return generatedIdToTimestamp(entity._id)
+	}
+}

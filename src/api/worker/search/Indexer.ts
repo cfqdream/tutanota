@@ -52,7 +52,7 @@ import type {EntityUpdate} from "../../entities/sys/EntityUpdate"
 import {EntityClient} from "../../common/EntityClient"
 import {deleteObjectStores} from "../utils/DbUtils"
 import {aes256Decrypt, aes256Encrypt, aes256RandomKey, decrypt256Key, encrypt256Key, IV_BYTE_LENGTH, random} from "@tutao/tutanota-crypto"
-import {EntityRestCache} from "../rest/EntityRestCache"
+import {EntityRestCache} from "../rest/cache/EntityRestCache.js"
 
 export const Metadata = {
 	userEncDbKey: "userEncDbKey",

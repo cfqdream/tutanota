@@ -1,14 +1,14 @@
 import {TokenOrNestedTokens} from "cborg/types/interface.js"
-import {ListElementEntity, SomeEntity} from "../../common/EntityTypes.js"
-import {firstBiggerThanSecond} from "../../common/utils/EntityUtils.js"
+import {ListElementEntity, SomeEntity} from "../../../common/EntityTypes.js"
+import {firstBiggerThanSecond} from "../../../common/utils/EntityUtils.js"
 import {CacheStorage, expandId} from "./EntityRestCache.js"
 import * as cborg from "cborg"
 import {EncodeOptions, Token, Type} from "cborg"
 import {assert, TypeRef} from "@tutao/tutanota-utils"
-import type {OfflineDbFacade} from "../../../desktop/db/OfflineDbFacade"
-import {isOfflineStorageAvailable, isTest} from "../../common/Env"
-import {ProgrammingError} from "../../common/error/ProgrammingError"
-import {SessionType} from "../../common/SessionType"
+import type {OfflineDbFacade} from "../../../../desktop/db/OfflineDbFacade"
+import {isOfflineStorageAvailable, isTest} from "../../../common/Env"
+import {ProgrammingError} from "../../../common/error/ProgrammingError"
+import {SessionType} from "../../../common/SessionType"
 
 function dateEncoder(data: Date, typ: string, options: EncodeOptions): TokenOrNestedTokens | null {
 	return [

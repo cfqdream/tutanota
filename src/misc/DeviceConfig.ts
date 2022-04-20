@@ -29,6 +29,7 @@ interface ConfigObject {
 	_encryptedCredentialsKey: Base64 | null
 	_testDeviceId: string | null
 	_testAssignments: PersistedAssignmentData | null
+	_storedDataTimeRange: Record<Id, number>
 }
 
 /**
@@ -80,7 +81,8 @@ export class DeviceConfig implements CredentialsStorage, UsageTestStorage {
 			_hiddenCalendars: loadedConfig._hiddenCalendars ?? {},
 			_testDeviceId: loadedConfig._testDeviceId ?? null,
 			_testAssignments: loadedConfig._testAssignments ?? null,
-			_signupToken: signupToken
+			_signupToken: signupToken,
+			_storedDataTimeRange: loadedConfig._storedDataTimeRange ?? {},
 		}
 
 		// We need to write the config if there was a migration and if we generate the signup token and if.
@@ -249,6 +251,15 @@ export class DeviceConfig implements CredentialsStorage, UsageTestStorage {
 			this.config._encryptedCredentialsKey = null
 		}
 
+		this.writeToStorage()
+	}
+
+	getStoredDataTimeRangeForUser(userId: Id): number | null {
+		return this.config._storedDataTimeRange[userId] ?? null
+	}
+
+	setStoredDataTimeRangeForUser(userId: Id, range: number) {
+		this.config._storedDataTimeRange[userId] = range
 		this.writeToStorage()
 	}
 

@@ -40,7 +40,7 @@ export const _TypeModel: TypeModel = {
 		}
 	},
 	"app": "sys",
-	"version": "74"
+	"version": "75"
 }
 
 export function createU2fChallenge(values?: Partial<U2fChallenge>): U2fChallenge {

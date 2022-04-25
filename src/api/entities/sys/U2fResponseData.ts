@@ -44,7 +44,7 @@ export const _TypeModel: TypeModel = {
 	},
 	"associations": {},
 	"app": "sys",
-	"version": "74"
+	"version": "75"
 }
 
 export function createU2fResponseData(values?: Partial<U2fResponseData>): U2fResponseData {

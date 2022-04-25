@@ -47,7 +47,7 @@ export const _TypeModel: TypeModel = {
 		}
 	},
 	"app": "sys",
-	"version": "74"
+	"version": "75"
 }
 
 export function createAlarmInfo(values?: Partial<AlarmInfo>): AlarmInfo {

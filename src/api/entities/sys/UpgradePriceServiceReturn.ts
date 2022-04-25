@@ -79,7 +79,7 @@ export const _TypeModel: TypeModel = {
 		}
 	},
 	"app": "sys",
-	"version": "74"
+	"version": "75"
 }
 
 export function createUpgradePriceServiceReturn(values?: Partial<UpgradePriceServiceReturn>): UpgradePriceServiceReturn {

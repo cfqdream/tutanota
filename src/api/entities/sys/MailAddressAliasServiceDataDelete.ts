@@ -46,7 +46,7 @@ export const _TypeModel: TypeModel = {
 		}
 	},
 	"app": "sys",
-	"version": "74"
+	"version": "75"
 }
 
 export function createMailAddressAliasServiceDataDelete(values?: Partial<MailAddressAliasServiceDataDelete>): MailAddressAliasServiceDataDelete {

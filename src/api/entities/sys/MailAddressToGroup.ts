@@ -53,7 +53,7 @@ export const _TypeModel: TypeModel = {
 		}
 	},
 	"app": "sys",
-	"version": "74"
+	"version": "75"
 }
 
 export function createMailAddressToGroup(values?: Partial<MailAddressToGroup>): MailAddressToGroup {

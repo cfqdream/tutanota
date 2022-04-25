@@ -8,27 +8,27 @@ export const _TypeModel: TypeModel = {
 	"name": "UsageTestMetricData",
 	"since": 1,
 	"type": "AGGREGATED_TYPE",
-	"id": 20,
-	"rootId": "BXVzYWdlABQ",
+	"id": 17,
+	"rootId": "BXVzYWdlABE",
 	"versioned": false,
 	"encrypted": false,
 	"values": {
 		"_id": {
-			"id": 21,
+			"id": 18,
 			"type": "CustomId",
 			"cardinality": "One",
 			"final": true,
 			"encrypted": false
 		},
 		"name": {
-			"id": 22,
+			"id": 19,
 			"type": "String",
 			"cardinality": "One",
 			"final": true,
 			"encrypted": false
 		},
 		"value": {
-			"id": 23,
+			"id": 20,
 			"type": "String",
 			"cardinality": "One",
 			"final": true,

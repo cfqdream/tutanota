@@ -72,7 +72,7 @@ export const _TypeModel: TypeModel = {
 	},
 	"associations": {},
 	"app": "sys",
-	"version": "74"
+	"version": "75"
 }
 
 export function createInvoiceItem(values?: Partial<InvoiceItem>): InvoiceItem {

@@ -30,7 +30,7 @@ export const _TypeModel: TypeModel = {
 	},
 	"associations": {},
 	"app": "sys",
-	"version": "74"
+	"version": "75"
 }
 
 export function createCustomerInfoReturn(values?: Partial<CustomerInfoReturn>): CustomerInfoReturn {

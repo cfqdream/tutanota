@@ -32,7 +32,7 @@ export const _TypeModel: TypeModel = {
 		}
 	},
 	"app": "sys",
-	"version": "74"
+	"version": "75"
 }
 
 export function createGiftCardsRef(values?: Partial<GiftCardsRef>): GiftCardsRef {

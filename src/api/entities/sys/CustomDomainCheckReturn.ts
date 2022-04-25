@@ -56,7 +56,7 @@ export const _TypeModel: TypeModel = {
 		}
 	},
 	"app": "sys",
-	"version": "74"
+	"version": "75"
 }
 
 export function createCustomDomainCheckReturn(values?: Partial<CustomDomainCheckReturn>): CustomDomainCheckReturn {

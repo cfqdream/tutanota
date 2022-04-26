@@ -11,6 +11,36 @@ import {DateProvider} from "../api/common/DateProvider.js"
 import {IServiceExecutor} from "../api/common/ServiceRequest"
 import {createUsageTestAssignmentIn} from "../api/entities/usage/UsageTestAssignmentIn"
 import {UsageTestAssignmentService, UsageTestParticipationService} from "../api/entities/usage/Services"
+import {Dialog} from "../gui/base/Dialog"
+import m, {Children} from "mithril"
+import {TextFieldN} from "../gui/base/TextFieldN"
+import {UsageTestMetricType} from "../api/common/TutanotaConstants"
+import stream from "mithril/stream"
+
+export async function showExperienceSamplingDialog(stage: Stage): Promise<void> {
+	Dialog.showActionDialog({
+		okAction: () => {
+		},
+		title: "Experience",
+		child: () => {
+			const children: Array<Children> = []
+			for (let metricConfig of stage.metricConfigs.values()) {
+				if (metricConfig.type as UsageTestMetricType === UsageTestMetricType.Likert) {
+					children.push(
+						m(TextFieldN, {
+							label: () => metricConfig.configValues.get("question")!,
+							value: stream("")
+						})
+					)
+				}
+			}
+
+			return children
+
+		},
+	})
+}
+
 
 export interface PersistedAssignmentData {
 	updatedAt: number
@@ -103,8 +133,23 @@ export class UsageTestModel implements PingAdapter {
 				usageTestAssignment.sendPings,
 			)
 
-			for (const index of usageTestAssignment.stages.keys()) {
-				test.addStage(new Stage(index, test))
+			for (const [index, stageConfig] of usageTestAssignment.stages.entries()) {
+				const stage = new Stage(index, test)
+				stageConfig.metrics.forEach(metricConfig => {
+					const configValues = new Map<string, string>()
+
+					metricConfig.configValues.forEach(metricConfigValue => {
+						configValues.set(metricConfigValue.key, metricConfigValue.value)
+					})
+
+					stage.setMetricConfig({
+						name: metricConfig.name,
+						type: metricConfig.type,
+						configValues,
+					})
+				})
+
+				test.addStage(stage)
 			}
 
 			return test

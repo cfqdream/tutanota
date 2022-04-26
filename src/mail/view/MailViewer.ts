@@ -70,6 +70,7 @@ import {animations, DomMutation, scroll} from "../../gui/animation/Animations"
 import {ease} from "../../gui/animation/Easing"
 import {isNewMailActionAvailable} from "../../gui/nav/NavFunctions"
 import {CancelledError} from "../../api/common/error/CancelledError"
+import {showExperienceSamplingDialog} from "../../misc/UsageTestModel"
 
 assertMainOrNode()
 // map of inline image cid to InlineImageReference
@@ -753,6 +754,7 @@ export class MailViewer implements Component<MailViewerAttrs> {
 					colors,
 					click: createDropdown({
 						lazyButtons: () => {
+							const startTime = new Date()
 							const moreButtons: Array<ButtonAttrs> = []
 
 							if (this.viewModel.isUnread()) {
@@ -837,6 +839,24 @@ export class MailViewer implements Component<MailViewerAttrs> {
 									type: ButtonType.Dropdown,
 								})
 							}
+
+							const test = locator.usageTestController.getTest("test")
+
+							test.renderVariant({
+								[0]: () => {
+								},
+								[1]: () => {
+									moreButtons.push({
+										label: () => "Variant 1",
+										click: async () => {
+											const stage = test.getStage(0)
+											await showExperienceSamplingDialog(stage)
+										},
+										icon: () => Icons.Picture,
+										type: ButtonType.Dropdown,
+									})
+								},
+							})
 
 							return moreButtons
 						}, width: 300
